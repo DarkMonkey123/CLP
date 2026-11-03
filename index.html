@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catálogo & Simulador CLP</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/catalog.css">
+  <link rel="stylesheet" href="css/simulator.css">
+</head>
+
+<body>
+
+  <!-- Cabeçalho Principal -->
+  <header class="app-header">
+    <div class="logo-container">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+        <line x1="8" y1="21" x2="16" y2="21"></line>
+        <line x1="12" y1="17" x2="12" y2="21"></line>
+      </svg>
+      <h1>AutoTech Hub</h1>
+    </div>
+    <button id="btn-theme-toggle" class="btn-icon" title="Alternar Tema">🌙</button>
+  </header>
+
+  <!-- MÓDULO 1: CATÁLOGO DE EQUIPAMENTOS -->
+  <main id="view-catalog" class="view-section active">
+    <!-- Coloque acima ou dentro do container do Catálogo -->
+    <div class="catalog-actions-bar" style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
+      <button class="btn-plc btn-plc-run" onclick="CatalogModule.openAddModal()">➕ Novo Equipamento</button>
+      <button class="btn-plc" onclick="CatalogModule.openImportModal()">📥 Importar Lista (JSON)</button>
+      <button class="btn-plc" onclick="CatalogModule.exportToDataJS()"
+        title="Baixar JSON formatado para colar direto no data.js">📤 Exportar Lista Atual</button>
+    </div>
+
+    <!-- Modal 1: Form para Adicionar Equipamento Manualmente -->
+    <div id="modal-add-equipment" class="config-modal-overlay">
+      <div class="config-modal-card" style="max-width: 600px; max-height: 90vh; overflow-y: auto;">
+        <h3 class="config-modal-title">📦 Cadastrar Novo Equipamento</h3>
+        <form id="form-add-equipment" onsubmit="CatalogModule.handleFormSubmit(event)">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+            <div>
+              <label>Nome do Equipamento:*</label>
+              <input type="text" id="add-name" class="config-input-text" required
+                placeholder="Ex: Sensor Fotoelétrico Laser">
+            </div>
+            <div>
+              <label>Categoria:*</label>
+              <select id="add-category" class="config-input-select" required></select>
+            </div>
+          </div>
+
+          <div style="margin-top: 0.5rem;">
+            <label>Descrição Curta:*</label>
+            <input type="text" id="add-shortDesc" class="config-input-text" required
+              placeholder="Resumo de 1 linha para o card">
+          </div>
+
+          <div style="margin-top: 0.5rem;">
+            <label>Para que serve:*</label>
+            <textarea id="add-purpose" class="config-input-text" style="height: 60px;" required
+              placeholder="Explicação funcional..."></textarea>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
+            <div>
+              <label>Como Funciona (Linguagem Simples):</label>
+              <input type="text" id="add-simpleHow" class="config-input-text"
+                placeholder="Ex: Funciona como uma foto...">
+            </div>
+            <div>
+              <label>Princípio Técnico:</label>
+              <input type="text" id="add-techHow" class="config-input-text"
+                placeholder="Ex: Emissão de feixe de luz...">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
+            <div>
+              <label>Tensão de Operação:</label>
+              <input type="text" id="add-voltage" class="config-input-text" placeholder="Ex: 24VDC">
+            </div>
+            <div>
+              <label>Tipo de Sinal:</label>
+              <input type="text" id="add-signal" class="config-input-text" placeholder="Ex: PNP Digital (NA)">
+            </div>
+          </div>
+
+          <div style="margin-top: 0.5rem;">
+            <label>Aplicações Comuns (separadas por vírgula):</label>
+            <input type="text" id="add-apps" class="config-input-text"
+              placeholder="Contagem em esteira, Detecção de falhas">
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem;">
+            <button type="button" class="btn-tool"
+              onclick="document.getElementById('modal-add-equipment').classList.remove('active')">Cancelar</button>
+            <button type="submit" class="btn-plc btn-plc-run">Salvar Equipamento</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal 2: Importação em Lote via JSON -->
+    <div id="modal-import-equipment" class="config-modal-overlay">
+      <div class="config-modal-card" style="max-width: 500px;">
+        <h3 class="config-modal-title">📥 Importar Lista de Equipamentos</h3>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+          Cole o conteúdo em formato JSON ou selecione um arquivo <code>.json</code> formatado.
+        </p>
+        <input type="file" id="input-json-file" accept=".json" style="margin-bottom: 0.5rem;"
+          onchange="CatalogModule.handleFileSelect(event)">
+        <textarea id="json-import-area" class="config-input-text"
+          style="height: 150px; font-family: monospace; font-size: 0.8rem;"
+          placeholder='[{"name": "Equipamento 1", "category": "Sensores de Campo", ...}]'></textarea>
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem;">
+          <button type="button" class="btn-tool"
+            onclick="document.getElementById('modal-import-equipment').classList.remove('active')">Cancelar</button>
+          <button type="button" class="btn-plc btn-plc-run" onclick="CatalogModule.processJSONImport()">Processar e
+            Importar</button>
+        </div>
+      </div>
+    </div>
+    <div id="subview-category-blocks">
+      <h2>Categorias de Equipamentos</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 1rem;">Selecione uma área técnica para explorar os
+        componentes:</p>
+      <div id="category-blocks-container" class="category-blocks-grid"></div>
+    </div>
+
+    <div id="subview-equipment-list" style="display: none;">
+      <div class="catalog-header">
+        <button id="btn-back-to-categories" class="btn-back">← Voltar para Categorias</button>
+        <h2 id="current-category-title">Categoria</h2>
+      </div>
+
+      <div class="search-container">
+        <input type="text" id="input-search" class="search-input" placeholder="Buscar por nome ou especificação...">
+      </div>
+
+      <div id="equipments-grid" class="equipments-grid"></div>
+    </div>
+  </main>
+
+  <!-- MÓDULO 2: SIMULADOR DE CLP -->
+  <main id="view-simulator" class="view-section">
+
+    <!-- Painel Físico de Hardware CLP -->
+    <section class="plc-hardware-panel">
+      <div class="plc-hardware-header">
+        <div class="plc-lcd-screen">
+          <div id="plc-scan-led" class="scan-indicator" title="Scan Cycle"></div>
+          <span id="plc-lcd-status-text" class="plc-lcd-status">MODE: RUN</span>
+        </div>
+        <div class="plc-action-btns">
+          <button id="btn-plc-run" class="btn-plc btn-plc-run">▶ RUN</button>
+          <button id="btn-plc-stop" class="btn-plc btn-plc-stop">⏹ STOP</button>
+          <button id="btn-plc-reset" class="btn-plc btn-plc-reset">🔄 RESET</button>
+        </div>
+      </div>
+
+      <!-- Entradas Digitais -->
+      <div class="io-section-title">Entradas Digitais (I0.0 - I0.7)</div>
+      <div id="plc-inputs-container" class="io-grid"></div>
+
+      <!-- Saídas Digitais -->
+      <div class="io-section-title">Saídas Digitais (Q0.0 - Q0.7)</div>
+      <div id="plc-outputs-container" class="io-grid"></div>
+    </section>
+
+    <!-- Editor de Lógica Ladder -->
+    <section class="ladder-editor-container">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+        <h3>Editor de Lógica Ladder</h3>
+        <button id="btn-add-rung" class="btn-plc btn-plc-run" style="font-size: 0.8rem;">+ Nova Linha (Rung)</button>
+      </div>
+
+      <div class="ladder-layout-grid">
+
+        <!-- Paleta Lateral de Instruções -->
+        <aside class="palette-panel">
+
+          <div>
+            <div class="palette-category-title">Contatos / Entradas</div>
+            <div class="palette-items-group">
+              <div class="palette-item" draggable="true" ondragstart="SimulatorModule.handleDragStart(event, 'NO')">
+                <span class="palette-symbol">| |</span>
+                <span class="palette-label">Contato NA</span>
+              </div>
+              <div class="palette-item" draggable="true" ondragstart="SimulatorModule.handleDragStart(event, 'NC')">
+                <span class="palette-symbol">| / |</span>
+                <span class="palette-label">Contato NF</span>
+              </div>
+              <div class="palette-item" draggable="true" ondragstart="SimulatorModule.handleDragStart(event, 'P_EDGE')">
+                <span class="palette-symbol">| P |</span>
+                <span class="palette-label">Pulso (Borda)</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="palette-category-title">Lógica de Selo</div>
+            <div class="palette-items-group">
+              <div class="palette-item" draggable="true"
+                ondragstart="SimulatorModule.handleDragStart(event, 'PARALLEL')">
+                <span class="palette-symbol">|| (Selo)</span>
+                <span class="palette-label">Ramo Paralelo</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="palette-category-title">Saídas / Atuadores</div>
+            <div class="palette-items-group">
+              <div class="palette-item" draggable="true" ondragstart="SimulatorModule.handleDragStart(event, 'COIL')">
+                <span class="palette-symbol">( )</span>
+                <span class="palette-label">Bobina Direta</span>
+              </div>
+              <div class="palette-item" draggable="true" ondragstart="SimulatorModule.handleDragStart(event, 'SET')">
+                <span class="palette-symbol">( S )</span>
+                <span class="palette-label">Bobina SET</span>
+              </div>
+              <div class="palette-item" draggable="true" ondragstart="SimulatorModule.handleDragStart(event, 'RESET')">
+                <span class="palette-symbol">( R )</span>
+                <span class="palette-label">Bobina RESET</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="palette-category-title">Avançados</div>
+            <div class="palette-items-group">
+              <div class="palette-item" draggable="true" ondragstart="SimulatorModule.handleDragStart(event, 'TON')">
+                <span class="palette-symbol">[ TON ]</span>
+                <span class="palette-label">Temporizador</span>
+              </div>
+              <div class="palette-item" draggable="true" ondragstart="SimulatorModule.handleDragStart(event, 'CTU')">
+                <span class="palette-symbol">[ CTU ]</span>
+                <span class="palette-label">Contador</span>
+              </div>
+            </div>
+          </div>
+
+        </aside>
+
+        <!-- Área de Trabalho das Linhas -->
+        <div id="ladder-workspace" class="ladder-workspace-panel"></div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal de Detalhes do Equipamento -->
+  <div id="modal-details" class="modal-overlay">
+    <div class="modal-content">
+      <button id="btn-modal-close" class="modal-close">&times;</button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Modal Personalizado de Configuração de Bloco Ladder -->
+  <div id="config-modal-overlay" class="config-modal-overlay">
+    <div class="config-modal-card">
+      <div class="config-modal-title">⚙️ Configurar Instrução</div>
+
+      <div class="config-field-group">
+        <label>Tag / Endereço Principal:</label>
+        <input type="text" id="config-primary-tag" class="config-input-select" placeholder="Ex: I0.0, Q0.0, T0, C0">
+      </div>
+
+      <div id="config-param-group" class="config-field-group" style="display: none;">
+        <label id="config-param-label">Parâmetro:</label>
+        <input type="text" id="config-param-val" class="config-input-select">
+      </div>
+
+      <div class="config-modal-actions">
+        <button id="btn-modal-cancel" class="btn-plc btn-plc-reset">Cancelar</button>
+        <button id="btn-modal-save" class="btn-plc btn-plc-run">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navegação Inferior -->
+  <nav class="tab-navigation">
+    <button class="tab-btn active" data-tab="catalog">
+      <svg viewBox="0 0 24 24">
+        <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z" />
+      </svg>
+      Catálogo
+    </button>
+    <button class="tab-btn" data-tab="simulator">
+      <svg viewBox="0 0 24 24">
+        <path
+          d="M22 9V7h-2V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-2h2v-2h-2v-2h2v-2h-2V9h2zm-4 10H4V5h14v14z" />
+      </svg>
+      Simulador CLP
+    </button>
+  </nav>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/simulator.js"></script>
+  <script src="js/catalog.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
+</body>
+
+</html>

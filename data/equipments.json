@@ -1,0 +1,496 @@
+[
+  {
+    "id": "clp",
+    "name": "Controlador Lógico Programável (CLP)",
+    "category": "Automação/CLP",
+    "shortDescription": "Cérebro eletrônico industrial que executa lógicas de controle de processos.",
+    "purpose": "Comandar máquinas e processos industriais lendo entradas (sensores) e acionando saídas (atuadores) de acordo com um programa gravado em sua memória.",
+    "howItWorks": {
+      "simple": "Funciona como um computador industrial que checa continuamente o estado dos botões e sensores e decide quais motores ou válvulas devem ser ligados.",
+      "technical": "Opera em um ciclo contínuo chamado Scan Cycle (Varredura): 1. Leitura das entradas físicas na memória de imagem; 2. Execução sequencial da lógica de programa (Ladder/FBD); 3. Atualização das saídas físicas."
+    },
+    "specs": {
+      "voltage": "24 VDC ou 100-240 VAC",
+      "current": "0.5 A a 3 A (Alimentação)",
+      "signalType": "Entradas/Saídas Digitais (0/24V) e Analógicas (4-20mA, 0-10V)",
+      "ranges": "Expansível até centenas de pontos de I/O"
+    },
+    "applications": [
+      "Linhas de montagem automatizadas",
+      "Sistemas de embalagem e envase",
+      "Controle de estações de tratamento de água",
+      "Sistemas de bombeamento e iluminação industrial"
+    ],
+    "safetyAndFailures": {
+      "safety": [
+        "Desligar a alimentação principal antes de manipular fiações de I/O.",
+        "Utilizar fontes de alimentação de 24VDC com proteção contra surtos."
+      ],
+      "commonFailures": [
+        "Queima de saídas a relé/transistor por curto-circuito na carga.",
+        "Ruído eletromagnético nas entradas analógicas por falta de blindagem (shield)."
+      ]
+    },
+    "relatedIds": ["ihm", "fonte-24v", "sensor-indutivo", "contatora"]
+  },
+  {
+    "id": "contatora",
+    "name": "Contatora de Potência",
+    "category": "Elétrica",
+    "shortDescription": "Chave eletromecânica utilizada para manobrar cargas elétricas de alta corrente.",
+    "purpose": "Ligar e desligar cargas de alta potência (como motores e resistências) remotamente através de um sinal de baixa potência enviado pelo CLP ou botoeira.",
+    "howItWorks": {
+      "simple": "Quando uma corrente passa pela bobina interna, ela cria um campo magnético que atrai contatos metálicos, fechando o circuito e ligando o motor.",
+      "technical": "A energização da bobina (A1-A2) gera um fluxo magnético no núcleo fixo que atrai o núcleo móvel, vencendo a força das molas de retorno e alterando o estado dos contatos principais (1-L1, 3-L2, 5-L3) e auxiliares (NA/NF)."
+    },
+    "specs": {
+      "voltage": "Bobina: 24 VDC / 220 VAC; Carga: Até 690 VAC",
+      "current": "9 A a mais de 800 A (Categorias AC-1, AC-3)",
+      "signalType": "Acionamento On/Off por Bobina",
+      "ranges": "Frequência de operação até 1200 manobras/hora"
+    },
+    "applications": [
+      "Acionamento de motores trifásicos",
+      "Ligamento de bancos de resistências de aquecimento",
+      "Chaveamento de sistemas de iluminação de grande porte"
+    ],
+    "safetyAndFailures": {
+      "safety": [
+        "Nunca operar sem a capa de proteção contra arcos elétricos.",
+        "Dimensionar corretamente para a categoria de emprego (ex: AC-3 para motores)."
+      ],
+      "commonFailures": [
+        "Soldagem dos contatos devido a picos de corrente ou curtos-circuitos.",
+        "Ruído excessivo (zumbido) na bobina provocado por sujeira no núcleo magnético."
+      ]
+    },
+    "relatedIds": ["rele-termico", "disjuntor-motor", "motor-trifasico", "clp"]
+  },
+  {
+    "id": "rele-termico",
+    "name": "Relé Térmico de Sobrecarga",
+    "category": "Elétrica",
+    "shortDescription": "Dispositivo de proteção contra aquecimento excessivo em motores elétricos.",
+    "purpose": "Proteger motores elétricos contra sobrecargas sustentadas e falta de fase, evitando que o isolamento do motor queime por superaquecimento.",
+    "howItWorks": {
+      "simple": "Possui lâminas internas que se curvam quando esquentam demais com a corrente elétrica. Se esquentarem muito, elas se movem e desligam a contatora.",
+      "technical": "Baseia-se na deformação de lâminas bimetálicas com diferentes coeficientes de dilatação térmica. O aquecimento por Efeito Joule desvia as lâminas que acionam um mecanismo mecânico, abrindo o contato auxiliar de comando 95-96."
+    },
+    "specs": {
+      "voltage": "Até 690 VAC",
+      "current": "Ajustável (ex: 1.6A-2.5A, 4A-6.3A, etc.)",
+      "signalType": "Contatos auxiliares secos (95-96 NF, 97-98 NA)",
+      "ranges": "Classe de disparo 10A, 10, 20, 30"
+    },
+    "applications": [
+      "Proteção individual de motores elétricos trifásicos em painéis elétricos",
+      "Quadros de comando de bombas e compressores"
+    ],
+    "safetyAndFailures": {
+      "safety": [
+        "Ajustar a corrente de disparo exatamente para a corrente nominal (In) do motor.",
+        "Não utilizar como proteção contra curto-circuito (exige fusível ou disjuntor prévio)."
+      ],
+      "commonFailures": [
+        "Disparo falso por má fixação dos cabos nos terminais de potência.",
+        "Mecanismo travado por acúmulo de poeira ou degradação do plástico."
+      ]
+    },
+    "relatedIds": ["contatora", "motor-trifasico", "disjuntor-motor"]
+  },
+  {
+    "id": "disjuntor-motor",
+    "name": "Disjuntor Motor Magnetotérmico",
+    "category": "Elétrica",
+    "shortDescription": "Proteção completa contra curto-circuito e sobrecarga para motores.",
+    "purpose": "Garantir a proteção magnética (curto-circuito) e térmica (sobrecarga) dos condutores e do motor em um único dispositivo compacto.",
+    "howItWorks": {
+      "simple": "É um interruptor inteligente que desliga sozinho e instantaneamente se houver um curto-circuito, ou desliga de forma controlada se o motor puxar mais corrente que o normal.",
+      "technical": "Combina um disparador eletromagnético instantâneo para altas correntes de curto-circuito com um disparador bimetálico térmico temporizado para sobrecargas operacionais."
+    },
+    "specs": {
+      "voltage": "Até 690 VAC",
+      "current": "Faixas de ajuste térmico de 0.1A até 100A",
+      "signalType": "Manopla rotativa ou botões rotativos com acionamento manual",
+      "ranges": "Capacidade de interrupção (Icu) até 100 kA"
+    },
+    "applications": [
+      "Proteção de partida direta e suave de motores",
+      "Isolamento seguro de circuitos em painéis de comando"
+    ],
+    "safetyAndFailures": {
+      "safety": [
+        "Possibilita bloqueio por cadeado (LOTO) na posição DESLIGADO durante manutenções.",
+        "Verificar a capacidade de interrupção em relação à corrente de curto da instalação."
+      ],
+      "commonFailures": [
+        "Desarme frequente se ajustado abaixo da corrente nominal de serviço.",
+        "Desgaste mecânico do mecanismo de gatilho interno após múltiplas aberturas em curto."
+      ]
+    },
+    "relatedIds": ["contatora", "rele-termico", "motor-trifasico"]
+  },
+  {
+    "id": "sensor-indutivo",
+    "name": "Sensor de Proximidade Indutivo",
+    "category": "Sensores",
+    "shortDescription": "Detector sem contato físico para objetos metálicos.",
+    "purpose": "Detectar a presença, passagem ou fim de curso de peças metálicas sem desgaste mecânico e em altíssima velocidade.",
+    "howItWorks": {
+      "simple": "Cria um campo magnético invisível na sua ponta. Quando qualquer metal se aproxima, esse campo muda e o sensor acende um LED e envia um sinal ao CLP.",
+      "technical": "Um circuito oscilador gera um campo magnético de alta frequência na face sensora. A aproximação de um condutor metálico induz correntes parasitas (Foucault), reduzindo a amplitude de oscilação que é detectada por um disparador Schmitt."
+    },
+    "specs": {
+      "voltage": "10 a 30 VDC",
+      "current": "Consumo < 15mA; Saída até 200mA",
+      "signalType": "PNP ou NPN (Digital - NA/NF)",
+      "ranges": "Distância de sensoriamento (Sn): 1mm a 25mm"
+    },
+    "applications": [
+      "Contagem de peças metálicas em esteiras",
+      "Detecção de posição de eixos e atuadores",
+      "Monitoramento de rotação de engrenagens"
+    ],
+    "safetyAndFailures": {
+      "safety": [
+        "Respeitar o tipo de fiação (PNP para entradas sinking / NPN para sourcing).",
+        "Atentar para o fator de correção de distância dependendo do metal (Alumínio reduz Sn)."
+      ],
+      "commonFailures": [
+        "Danificação física da face sensora por colisão com peças mecânicas.",
+        "Interferência em fios de sinal não blindados instalados junto a cabos de motor."
+      ]
+    },
+    "relatedIds": ["clp", "sensor-capacitivo", "cilindro-pneumatico"]
+  },
+  {
+    "id": "sensor-capacitivo",
+    "name": "Sensor de Proximidade Capacitivo",
+    "category": "Sensores",
+    "shortDescription": "Detector de presença para materiais metálicos e não-metálicos.",
+    "purpose": "Detectar líquidos, plásticos, grãos, madeira, vidro ou metais através de superfícies não metálicas ou visada direta.",
+    "howItWorks": {
+      "simple": "Funciona como um sensor de toque sem contato que percebe quando qualquer objeto (até líquidos ou plásticos) chega perto da sua ponta.",
+      "technical": "A face sensora funciona como uma das placas de um capacitor aberto. A aproximação de qualquer material com constante dielétrica diferente do ar altera a capacitância do circuito, acionando o estágio de saída."
+    },
+    "specs": {
+      "voltage": "10 a 30 VDC ou 20-250 VAC",
+      "current": "Saída até 250mA",
+      "signalType": "PNP/NPN Digital (Transistor) ou Relé",
+      "ranges": "Sn ajustável de 2mm a 20mm por trimpot traseiro"
+    },
+    "applications": [
+      "Detecção de nível de líquidos em reservatórios plásticos",
+      "Verificação de preenchimento de caixas de papelão ou embalagens",
+      "Detecção de grãos em silos agrícolas"
+    ],
+    "safetyAndFailures": {
+      "safety": [
+        "Ajustar o trimpot de sensibilidade para ignorar o acúmulo de sujeira na face sensora.",
+        "Manter distância de fontes de alta frequência de rádio/inversores."
+      ],
+      "commonFailures": [
+        "Ativações falsas provocadas por umidade alta ou condensação de água na face sensora.",
+        "Perda de sensibilidade por acúmulo de poeira impregnada."
+      ]
+    },
+    "relatedIds": ["sensor-indutivo", "sensor-fotoeletrico", "clp"]
+  },
+  {
+    "id": "sensor-fotoeletrico",
+    "name": "Sensor Fotoelétrico Refletivo",
+    "category": "Sensores",
+    "shortDescription": "Sensor óptico de presença por feixe de luz.",
+    "purpose": "Detectar objetos de qualquer natureza a médias e longas distâncias utilizando reflexão de luz infravermelha ou laser.",
+    "howItWorks": {
+      "simple": "Dispara um raio de luz invisível contra um espelho especial. Se um objeto passar no meio e interromper a luz, o sensor avisa a máquina.",
+      "technical": "Possui um emissor (LED infravermelho) e um receptor óptico na mesma carcaça. O feixe emitido atinge um retrorrefletor e retorna ao receptor. A interrupção da luz pelo objeto aciona a saída."
+    },
+    "specs": {
+      "voltage": "10 a 30 VDC",
+      "current": "Consumo médio de 30mA",
+      "signalType": "Digital PNP/NPN (Light-ON / Dark-ON)",
+      "ranges": "Distância de detecção até 5 metros"
+    },
+    "applications": [
+      "Barreiras de contagem em esteiras transportadoras",
+      "Portas automáticas e sistemas de cancelas",
+      "Identificação de altura e presença de paletes em estoques"
+    ],
+    "safetyAndFailures": {
+      "safety": [
+        "Não utilizar fotoelétricos comuns como sistemas de proteção de segurança humana (usar Cortinas de Luz para esta função).",
+        "Proteger as lentes contra impactos mecânicos."
+      ],
+      "commonFailures": [
+        "Desalinhamento óptico entre o sensor e o espelho refletor por vibração da estrutura.",
+        "Sujeira ou névoa de óleo acumulada na lente bloqueando o feixe de luz."
+      ]
+    },
+    "relatedIds": ["sensor-indutivo", "clp", "ihm"]
+  },
+  {
+    "id": "botoeira",
+    "name": "Botoeira Industrial Pulsadora",
+    "category": "Elétrica",
+    "shortDescription": "Interface manual para comando humano imediato em painéis.",
+    "purpose": "Permitir que o operador envie sinais manuais temporários de partida, parada ou pulso para o circuito de comando.",
+    "howItWorks": {
+      "simple": "Um botão com mola que aciona um contato elétrico enquanto mantido pressionado e volta sozinho quando você solta.",
+      "technical": "Ao ser pressionado, o atuador mecânico desloca os blocos de contato internos metálicos, comutando a condição dos contatos Normalmente Aberto (NA - 13/14) ou Normalmente Fechado (NF - 11/12)."
+    },
+    "specs": {
+      "voltage": "Até 600V nos contatos",
+      "current": "Até 10A (AC-15 em 230V)",
+      "signalType": "Contato Seco sem potencial",
+      "ranges": "Diâmetro padrão de furação de painel: 22mm"
+    },
+    "applications": [
+      "Botão de Start/Stop de motores e máquinas",
+      "Comandos de reset de falhas de painel",
+      "Sinalização de operações manuais"
+    ],
+    "safetyAndFailures": {
+      "safety": [
+        "Usar cores padronizadas: Verde (Início/Ligar), Vermelho (Parada/Desligar), Amarelo (Atenção/Reset).",
+        "Botões de Emergência devem ter travamento do tipo soco-trava mecânico."
+      ],
+      "commonFailures": [
+        "Oxidação dos contatos elétricos em ambientes muito úmidos ou agressivos.",
+        "Quebra da mola de retorno mecânico por excesso de força do operador."
+      ]
+    },
+    "relatedIds": ["contatora", "clp", "rele-auxiliar"]
+  },
+  {
+    "id": "motor-trifasico",
+    "name": "Motor Elétrico Trifásico (Indução)",
+    "category": "Mecânica",
+    "shortDescription": "Principal atuador para conversão de energia elétrica em energia mecânica.",
+    "purpose": "Proporcionar torque mecânico rotacional para acionar bombas, ventiladores, compressores, esteiras e máquinas em geral.",
+    "howItWorks": {
+      "simple": "A energia elétrica trifásica cria um campo magnético giratório no motor que 'puxa' o eixo central, fazendo-o girar com muita força.",
+      "technical": "A aplicação de correntes alternadas trifásicas desfasadas 120° no estator gera um Campo Magnético Girante (CMG). Este campo induz correntes no rotor ('gaiola de esquilo'), produzindo um campo magnético oposto que gera o torque de rotação."
+    },
+    "specs": {
+      "voltage": "220V / 380V / 440V Trifásico",
+      "current": "Varia de acordo com a potência (ex: 3.5A para 1CV em 220V)",
+      "signalType": "Alimentação de Potência Senoidal 60Hz",
+      "ranges": "Rendimento IE2/IE3, carcaças de 0.25 CV a mais de 500 CV"
+    },
+    "applications": [
+      "Tracionamento de correias e transportadores",
+      "Bombas centrífugas de água e fluidos",
+      "Exaustores e ventiladores industriais"
+    ],
+    "safetyAndFailures": {
+      "safety": [
+        "Garantir aterramento adequado da carcaça do motor no barramento PE.",
+        "Verificar sentido de rotação correto antes do acoplamento mecânico definitivo."
+      ],
+      "commonFailures": [
+        "Queima do enrolamento do estator por operação em falta de fase.",
+        "Desgaste dos rolamentos por desalinhamento do eixo ou falta de lubrificação."
+      ]
+    },
+    "relatedIds": ["contatora", "rele-termico", "inversor-frequencia", "disjuntor-motor"]
+  },
+  {
+    "id": "inversor-frequencia",
+    "name": "Inversor de Frequência (VFD)",
+    "category": "Acionamentos",
+    "shortDescription": "Controlador eletrônico de velocidade e torque para motores elétricos.",
+    "purpose": "Variar a velocidade de rotação de motores trifásicos, controlar aceleração/desaceleração e economizar energia elétrica.",
+    "howItWorks": {
+      "simple": "Transforma a energia fixa da rede e gera uma nova energia ajustável, permitindo acelerar ou desacelerar o motor de forma suave como um pedal de acelerador.",
+      "technical": "Converte a tensão CA da rede em CC através de uma ponte retificadora. O barramento CC é filtrado por capacitores e reconstruído em uma tensão CA de frequência e amplitude variáveis usando transistores IGBT via Modulação por Largura de Pulso (PWM)."
+    },
+    "specs": {
+      "voltage": "Entrada: 220V Mono/Tri ou 380-480V Tri; Saída: 0-Ventrada",
+      "current": "Dimensionado pela corrente nominal de saída (A)",
+      "signalType": "Sinais de controle 0-10V, 4-20mA, Modbus/Profinet",
+      "ranges": "Frequência de saída de 0 Hz a 400 Hz"
+    },
+    "applications": [
+      "Controle de vazão em bombas sem necessidade de válvulas estranguladoras",
+      "Pontes rolantes e elevadores para paradas suaves sem solavancos",
+      "Sistemas de exaustão inteligentes"
+    ],
+    "safetyAndFailures": {
+      "safety": [
+        "Aguardar a descarga total dos capacitores do barramento CC (mínimo 5-10 min) antes de tocar nas conexões.",
+        "Utilizar cabos blindados aterrados nas duas pontas entre inversor e motor."
+      ],
+      "commonFailures": [
+        "Erros de Sobretensão (Overvoltage) durante desacelerações muito rápidas sem resistor de frenagem.",
+        "Superaquecimento dos módulos IGBT por ventoinha de arrefecimento travada ou sujeira."
+      ]
+    },
+    "relatedIds": ["motor-trifasico", "clp", "ihm"]
+  },
+  {
+    "id": "valvula-solenoide",
+    "name": "Válvula Solenoide Direcional",
+    "category": "Pneumática",
+    "shortDescription": "Válvula acionada eletricamente para controle de fluxo de ar comprimido ou fluidos.",
+    "purpose": "Direcionar o fluxo de ar comprimido para avançar ou recuar cilindros pneumáticos através de um comando elétrico vindo do CLP.",
+    "howItWorks": {
+      "simple": "É uma torneira elétrica rápida: quando você envia energia para o fio dela, um eletroímã puxa um pino interno e libera o ar para o pistão.",
+      "technical": "Uma bobina elétrica cria um campo magnético que atrai um êmbolo usinado. Este deslocamento altera as passagens internas de ar comprimido entre os canais de pressão (P), utilização (A/B) e escape (R/S)."
+    },
+    "specs": {
+      "voltage": "24 VDC, 110 VAC ou 220 VAC",
+      "current": "Consumo de 2W a 5W em CC",
+      "signalType": "Acionamento On/Off Digital",
+      "ranges": "Pressão de trabalho de 1.5 a 10 bar"
+    },
+    "applications": [
+      "Comando de cilindros e garras pneumáticas",
+      "Sinalização e dosagem de fluidos em indústrias químicas",
+      "Sistemas de sopro e limpeza automatizados"
+    ],
+    "safetyAndFailures": {
+      "safety": [
+        "Instalar sempre um filtro e regulador de ar purificado e lubrificado a montante das válvulas.",
+        "Garantir botão de despressurização manual no circuito pneumático."
+      ],
+      "commonFailures": [
+        "Travamento do carretel interno por contaminação com água ou partículas de poeira no ar.",
+        "Queima da bobina solenoide por energização sem o núcleo magnético montado."
+      ]
+    },
+    "relatedIds": ["cilindro-pneumatico", "clp", "fonte-24v"]
+  },
+  {
+    "id": "cilindro-pneumatico",
+    "name": "Cilindro Pneumático Dupla Ação",
+    "category": "Pneumática",
+    "shortDescription": "Atuador linear acionado por ar comprimido.",
+    "purpose": "Converter a energia potencial do ar comprimido em movimento mecânico linear reto de empurrar, puxar ou levantar cargas.",
+    "howItWorks": {
+      "simple": "Um tubo com um êmbolo dentro. Quando o ar entra por um lado o braço do cilindro sai; quando entra pelo outro lado o braço recolhe.",
+      "technical": "O ar comprimido injetado na câmara traseira empurra o embolo e a haste para fora (Avanço). Para o retorno (Recuo), o ar é direcionado à câmara dianteira enquanto a câmara traseira é conectada ao escape."
+    },
+    "specs": {
+      "voltage": "Não se aplica (Mecânico/Pneumático)",
+      "current": "Não se aplica",
+      "signalType": "Pressão Pneumática (Ar comprimido filtrado)",
+      "ranges": "Diâmetros de 12mm a 320mm; Cursos de 10mm a mais de 2000mm"
+    },
+    "applications": [
+      "Empurradores de caixas e desvios de linha",
+      "Prensas e fixadores pneumáticos de peças",
+      "Abertura e fechamento de comportas e portas industriais"
+    ],
+    "safetyAndFailures": {
+      "safety": [
+        "Cuidado com pontos de esmagamento durante a movimentação rápida da haste.",
+        "Utilizar reguladores de fluxo para controlar a velocidade de movimento."
+      ],
+      "commonFailures": [
+        "Vazamento de ar pelas gaxetas de vedação gastas da haste.",
+        "Empeno da haste por aplicação de cargas laterais não suportadas."
+      ]
+    },
+    "relatedIds": ["valvula-solenoide", "sensor-indutivo", "clp"]
+  },
+  {
+    "id": "ihm",
+    "name": "Interface Homem-Máquina (IHM)",
+    "category": "Automação/CLP",
+    "shortDescription": "Painel com tela sensível ao toque para monitoramento e controle de processos.",
+    "purpose": "Permitir que operadores visualizem o estado da máquina em tempo real, alterem parâmetros de processo e visualizem alarmes.",
+    "howItWorks": {
+      "simple": "É um tablet industrial muito resistente fixado na porta do painel que se comunica direto com o CLP para mostrar desenhos da máquina e botões virtuais.",
+      "technical": "Equipamento microprocessado com sistema operacional embutido que executa telas gráficas. Comunica-se com o CLP via protocolos industriais (Modbus RTU/TCP, Profinet, Ethernet/IP) para ler e escrever tags de memória."
+    },
+    "specs": {
+      "voltage": "24 VDC",
+      "current": "0.3 A a 1.5 A",
+      "signalType": "Comunicação Serial (RS485/RS232) e Ethernet (RJ45)",
+      "ranges": "Telas coloridas TFT Touchscreen de 4.3\" até 15.6\""
+    },
+    "applications": [
+      "Central de comando na porta de painéis industriais",
+      "Exibição de gráficos de tendência de temperatura e pressão",
+      "Gerenciamento de receitas de produção e histórico de alarmes"
+    ],
+    "safetyAndFailures": {
+      "safety": [
+        "Proteger a tela contra ferramentas afiadas e solventes agressivos.",
+        "Configurar níveis de senha para evitar alterações críticas por operadores não autorizados."
+      ],
+      "commonFailures": [
+        "Perda de comunicação com o CLP por cabo rompido ou configurações de IP incorretas.",
+        "Descalibração ou falha do touch no vidro capacitivo/resistivo."
+      ]
+    },
+    "relatedIds": ["clp", "inversor-frequencia", "fonte-24v"]
+  },
+  {
+    "id": "fonte-24v",
+    "name": "Fonte de Alimentação Chaveada 24VDC",
+    "category": "Elétrica",
+    "shortDescription": "Conversor de tensão alternada para contínua para circuitos de comando.",
+    "purpose": "Fornecer uma tensão contínua estável e purificada de 24VDC para alimentar CLPs, sensores, IHM e relés com total segurança.",
+    "howItWorks": {
+      "simple": "Pega a energia da tomada (110V ou 220V AC) e transforma em uma energia de 24V DC limpa e sem oscilações para não queimar as placas eletrônicas.",
+      "technical": "Retifica a entrada CA, chaveia a tensão em alta frequência via semicondutores, rebaixa através de um transformador compacto e filtra a saída para obter 24VDC estabilizados com alta eficiência térmica (>85%)."
+    },
+    "specs": {
+      "voltage": "Entrada: 85-264 VAC; Saída: 24 VDC (Ajustável ±10%)",
+      "current": "Modelos de 2.5A, 5A, 10A, 20A a 40A",
+      "signalType": "Tensão Contínua Regulada (Rippel < 50mV)",
+      "ranges": "Fixação em Trilho DIN padrão"
+    },
+    "applications": [
+      "Alimentação de barramento de comando em painéis de automação",
+      "Alimentação de sensores de campo e transdutores",
+      "Alimentação de circuitos eletrônicos e interfaces de sinal"
+    ],
+    "safetyAndFailures": {
+      "safety": [
+        "Garantir espaço livre acima e abaixo do gabinete para ventilação por convecção.",
+        "Não ultrapassar a corrente máxima de pico especificada."
+      ],
+      "commonFailures": [
+        "Desarme da proteção por curto-circuito na fiação externa do campo.",
+        "Estufamento dos capacitores eletrolíticos por operação contínua em alta temperatura."
+      ]
+    },
+    "relatedIds": ["clp", "sensor-indutivo", "ihm", "rele-auxiliar"]
+  },
+  {
+    "id": "rele-auxiliar",
+    "name": "Relé Auxiliar Eletromecânico",
+    "category": "Elétrica",
+    "shortDescription": "Isolador e multiplicador de contatos de sinal elétrico.",
+    "purpose": "Isolar eletricamente o circuito de comando digital do CLP dos circuitos de carga ou multiplicar o número de contatos disponíveis.",
+    "howItWorks": {
+      "simple": "Um interruptor elétrico de pequeno porte que liga quando recebe um pequeno sinal elétrico na sua bobina, acionando várias chaves ao mesmo tempo.",
+      "technical": "Uma bobina atrai uma armadura mecânica de ferro macio ao ser energizada. A armadura comuta contatos reversíveis (SPDT/DPDT) isolando galvanicamente a bobina dos circuitos de saída."
+    },
+    "specs": {
+      "voltage": "Bobina: 24VDC, 24VAC, 110VAC, 220VAC; Contatos: até 250V",
+      "current": "Contatos dimensionados para 5A a 16A",
+      "signalType": "Bobina ON/OFF e Contatos Reversíveis (NA/NF)",
+      "ranges": "Soquete encaixável em trilho DIN com LED indicador"
+    },
+    "applications": [
+      "Interface de desacoplamento entre saídas do CLP e solenoides/contatoras",
+      "Multiplicação de sinais de alarme ou intertravamento",
+      "Inversão de lógica de contato (converter NA em NF)"
+    ],
+    "safetyAndFailures": {
+      "safety": [
+        "Usar diodo de roda-livre (supressor de surto) em paralelo com a bobina CC para evitar picos de sobretensão no transistor do CLP.",
+        "Respeitar o limite de corrente dos contatos finos."
+      ],
+      "commonFailures": [
+        "Carbonização dos contatos elétricos por acionamento de cargas indutivas sem proteção.",
+        "Desgaste prematuro por altas frequências de chaveamento."
+      ]
+    },
+    "relatedIds": ["clp", "botoeira", "fonte-24v", "contatora"]
+  }
+]
