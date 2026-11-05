@@ -55,6 +55,7 @@
 .plc-action-btns {
   display: flex;
   gap: 0.6rem;
+  flex-wrap: wrap;
 }
 
 .btn-plc {
@@ -78,6 +79,7 @@
 .btn-plc-run { background-color: var(--success-color); color: #ffffff; }
 .btn-plc-stop { background-color: var(--danger-color); color: #ffffff; }
 .btn-plc-reset { background-color: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-color); }
+.btn-plc-tag { background-color: var(--accent-color); color: #ffffff; }
 
 /* GRELHAS DE BORNES I/O */
 .io-section-title {
@@ -116,6 +118,19 @@
 .io-sub {
   font-size: 0.65rem;
   color: var(--text-secondary);
+}
+
+.io-card-tag {
+  font-size: 0.7rem;
+  color: var(--accent-color);
+  font-weight: 700;
+  display: block;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 95px;
+  text-align: center;
 }
 
 .io-mode-btn {
@@ -224,6 +239,26 @@
 }
 
 .palette-label { font-size: 0.8rem; font-weight: 600; }
+
+.btn-palette {
+  width: 100%;
+  padding: 0.5rem 0.8rem;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-palette:hover {
+  border-color: var(--accent-color);
+  background-color: var(--bg-surface);
+  color: var(--accent-color);
+}
 
 /* ÁREA DO DIAGRAMA LADDER */
 .ladder-workspace-panel {
@@ -443,6 +478,11 @@
   font-weight: 800;
   font-family: var(--font-mono);
   color: var(--accent-color);
+  max-width: 80px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
 }
 
 .ladder-block-sub {
@@ -583,7 +623,7 @@
 
 /* MODAL PERSONALIZADO DE CONFIGURAÇÃO DE BLOCOS (OCULTO POR PADRÃO) */
 .config-modal-overlay {
-  display: none; /* Garante que fique oculto até ser ativado */
+  display: none;
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   background-color: rgba(0, 0, 0, 0.75);
@@ -594,7 +634,7 @@
 }
 
 .config-modal-overlay.active {
-  display: flex; /* Exibe centralizado ao abrir */
+  display: flex;
 }
 
 .config-modal-card {
@@ -656,8 +696,52 @@
 }
 
 /* =========================================================================
-   NOVOS RECURSOS DO EDITOR (v2)
+   ESTILOS DA TABELA DE TAGS E RECURSOS DO SIMULADOR (Fase 1)
    ========================================================================= */
+
+.tags-table-container {
+  max-height: 380px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  margin-top: 0.8rem;
+}
+
+.tags-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.tags-table th, .tags-table td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tags-table th {
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.tags-table input[type="text"] {
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  box-sizing: border-box;
+}
+
+.tags-table input[type="text"]:focus {
+  border-color: var(--accent-color);
+  outline: none;
+}
 
 /* BARRA DE FERRAMENTAS */
 .ladder-toolbar {
@@ -701,7 +785,7 @@
   color: var(--warning-color, #f59e0b);
 }
 
-/* MARCADOR DE SOLTURA (arrastar e soltar) */
+/* MARCADOR DE SOLTURA */
 .drop-marker {
   display: none;
   position: fixed;

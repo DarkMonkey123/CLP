@@ -1,13 +1,14 @@
 /**
- * AUTO TECH HUB — MOTOR CLP + EDITOR LADDER  (v2)
+ * AUTO TECH HUB — MOTOR CLP + EDITOR LADDER (v2)
  * ---------------------------------------------------------------------------
  *  • Motor de varredura (scan) real: imagem de entradas → rungs → saídas
  *  • Contatos NA / NF / Pulso (borda), bobinas ( ) / SET / RESET, TON, CTU
  *  • Ramos paralelos aninháveis (até 3 níveis) com vários ramos
- *  • Arrastar da paleta, mover blocos, inserir na posição exata
+ *  • Arrastar da paleta, mover blocos, inserir na posição exata (Drag & Drop)
  *  • Modal de configuração com validação de endereços
  *  • Desfazer/Refazer, salvamento automático, exportar/importar JSON
  *  • Exemplos prontos, avisos de lógica (bobina duplicada, linha sem saída…)
+ *  • Gerenciamento simbólico de variáveis (Tabela de Tags)
  * ---------------------------------------------------------------------------
  */
 (function () {
@@ -98,6 +99,36 @@
       for (let i = 0; i < CONFIG.memory[area]; i++) list.push(area === 'T' || area === 'C' ? `${area}${i}` : `${area}0.${i}`);
     });
     return list;
+  }
+
+  /* ========================================================================
+   * GESTÃO DE TAGS (NOMES SIMBÓLICOS DE VARIÁVEIS - FASE 1)
+   * ====================================================================== */
+  const defaultTags = {
+    "I0.0": { name: "BOTAO_LIGA", comment: "Botoeira de partida" },
+    "I0.1": { name: "BOTAO_DESLIGA", comment: "Botoeira de parada" },
+    "I0.2": { name: "SENSOR_PECA", comment: "Sensor de presença" },
+    "I0.3": { name: "EMERGENCIA", comment: "Botão de emergência" },
+    "I0.4": { name: "CHAVE_MAN_AUTO", comment: "Chave seletora" },
+    "I0.5": { name: "RELE_TERMICO", comment: "Falha térmica motor" },
+    "I0.6": { name: "FIM_CURSO_AV", comment: "Sensor avanço" },
+    "I0.7": { name: "FIM_CURSO_REC", comment: "Sensor recuo" },
+    "Q0.0": { name: "MOTOR_01", comment: "Contatora motor principal" },
+    "Q0.1": { name: "VALVULA_AVANCO", comment: "Solenoide avanço" },
+    "Q0.2": { name: "VALVULA_RECUO", comment: "Solenoide recuo" },
+    "Q0.3": { name: "SINALEIRO_VERDE", comment: "Lâmpada em operação" },
+    "Q0.4": { name: "SINALEIRO_VERM", comment: "Lâmpada de falha" },
+    "Q0.5": { name: "ESTEIRA", comment: "Motor da esteira" },
+    "Q0.6": { name: "ALARME_SONORO", comment: "Sirene de aviso" },
+    "Q0.7": { name: "RELE_SEGURANCA", comment: "Habilitação geral" }
+  };
+  let currentTags = JSON.parse(JSON.stringify(defaultTags));
+
+  function getTagName(address) {
+    if (currentTags[address] && currentTags[address].name && currentTags[address].name.trim() !== '') {
+      return currentTags[address].name;
+    }
+    return address;
   }
 
   /* ========================================================================
@@ -509,7 +540,7 @@
     save() {
       try {
         localStorage.setItem(CONFIG.storageKey, JSON.stringify({
-          version: 2, rungs: ladderProgram.rungs, inputModes: cpuState.inputModes
+          version: 2, rungs: ladderProgram.rungs, inputModes: cpuState.inputModes, tags: currentTags
         }));
       } catch (e) { }
     },
@@ -518,7 +549,7 @@
         const raw = localStorage.getItem(CONFIG.storageKey);
         if (!raw) return null;
         const data = JSON.parse(raw);
-        return { rungs: sanitizeRungs(data.rungs), inputModes: data.inputModes };
+        return { rungs: sanitizeRungs(data.rungs), inputModes: data.inputModes, tags: data.tags };
       } catch (e) { return null; }
     }
   };
@@ -553,6 +584,7 @@
           <div class="io-card input-card" data-input="${idx}" tabindex="0" role="button" aria-pressed="false"
                title="Segure para pressionar (modo BOTÃO) · clique no rótulo para alternar BOTÃO/CHAVE">
             <span class="io-label">I0.${idx}</span>
+            <span class="io-card-tag" title="${esc(currentTags['I0.' + idx]?.comment || '')}">${esc(getTagName('I0.' + idx))}</span>
             <div id="led-input-${idx}" class="led-indicator"></div>
             <button type="button" class="io-mode-btn" data-input-mode="${idx}"
                     title="Alterna entre BOTÃO (momentâneo) e CHAVE (trava ligado/desligado)">${cpuState.inputModes[idx] === 'SWITCH' ? 'CHAVE' : 'BOTÃO'}</button>
@@ -563,6 +595,7 @@
         outputs.innerHTML = cpuState.Q.map((_, idx) => `
           <div class="io-card">
             <span class="io-label">Q0.${idx}</span>
+            <span class="io-card-tag" title="${esc(currentTags['Q0.' + idx]?.comment || '')}">${esc(getTagName('Q0.' + idx))}</span>
             <div id="led-output-${idx}" class="led-indicator"></div>
             <span class="io-sub">CARGA</span>
           </div>`).join('');
@@ -642,13 +675,17 @@
     blockHTML(node, warn) {
       const meta = TYPE_META[node.type];
       const w = warn.node[node.id];
-      const tip = `${meta.name} ${node.target}${w ? `\n⚠ ${w}` : ''}\nDuplo clique: editar · Delete: remover · Arraste: mover`;
+      const tagName = getTagName(node.target);
+      const isNamed = tagName !== node.target;
+      const tip = `${meta.name} ${node.target} (${tagName})${w ? `\n⚠ ${w}` : ''}\nDuplo clique: editar · Delete: remover · Arraste: mover`;
+      
       return `
         <div class="ladder-block${w ? ' has-warning' : ''}" data-node-id="${node.id}" data-type="${node.type}" draggable="true" title="${esc(tip)}">
           <button type="button" class="btn-delete-element" data-action="delete-node" data-node-id="${node.id}" title="Remover" aria-label="Remover ${esc(meta.name)}">×</button>
           <i class="bit-dot"></i>
+          <span class="ladder-block-tag" style="font-size: 0.68rem; color: var(--accent-color);">${isNamed ? esc(tagName) : ''}</span>
           <span class="ladder-block-symbol">${meta.symbol}</span>
-          <span class="ladder-block-tag">${esc(node.target)}</span>
+          <span class="ladder-block-tag" style="font-size: 0.72rem;">${esc(node.target)}</span>
           <span class="ladder-block-sub"></span>
         </div>`;
     },
@@ -776,6 +813,9 @@
         if (Array.isArray(stored.inputModes)) {
           cpuState.inputModes = cpuState.inputModes.map((m, i) => (stored.inputModes[i] === 'SWITCH' ? 'SWITCH' : 'BUTTON'));
         }
+        if (stored.tags) {
+          currentTags = Object.assign({}, defaultTags, stored.tags);
+        }
       }
       syncMemoryWithProgram();
       this.bindEvents();
@@ -783,7 +823,6 @@
       this.startLoop();
     },
 
-    /* ---- NOVO MÉTODO: Carrega presets do catálogo ---- */
     loadPreset(presetProgram) {
       if (!presetProgram) return;
       try {
@@ -982,6 +1021,41 @@
       this.commit();
     },
 
+    openTagsModal() {
+      const tbody = document.getElementById('tags-table-body');
+      if (!tbody) return;
+
+      tbody.innerHTML = '';
+      Object.keys(currentTags).sort().forEach((addr) => {
+        const isInput = addr.startsWith('I');
+        tbody.innerHTML += `
+          <tr>
+            <td style="font-family: var(--font-mono); font-weight: bold;">${addr}</td>
+            <td><span class="category-badge" style="background:${isInput ? '#1e3a8a' : '#065f46'}; color: #fff;">${isInput ? 'Entrada' : 'Saída'}</span></td>
+            <td><input type="text" id="tag-name-${addr}" value="${currentTags[addr].name || ''}" placeholder="Ex: MOTOR_01" /></td>
+            <td><input type="text" id="tag-comment-${addr}" value="${currentTags[addr].comment || ''}" placeholder="Descrição funcional" /></td>
+          </tr>`;
+      });
+      document.getElementById('modal-tags-manager')?.classList.add('active');
+    },
+
+    closeTagsModal() {
+      document.getElementById('modal-tags-manager')?.classList.remove('active');
+    },
+
+    saveTagsFromModal() {
+      Object.keys(currentTags).forEach((addr) => {
+        const nameInput = document.getElementById(`tag-name-${addr}`);
+        const commentInput = document.getElementById(`tag-comment-${addr}`);
+        if (nameInput) currentTags[addr].name = nameInput.value.trim().toUpperCase().replace(/\s+/g, '_');
+        if (commentInput) currentTags[addr].comment = commentInput.value.trim();
+      });
+
+      this.closeTagsModal();
+      Persistence.save();
+      LadderRenderer.buildDOMStructure();
+    },
+
     undo() {
       if (!History.undo()) { toast('Nada para desfazer.'); return; }
       selectedNodeId = null;
@@ -1026,7 +1100,7 @@
 
     exportProgram() {
       const data = JSON.stringify({
-        format: 'autotech-ladder', version: 2, rungs: ladderProgram.rungs, inputModes: cpuState.inputModes
+        format: 'autotech-ladder', version: 2, tags: currentTags, rungs: ladderProgram.rungs, inputModes: cpuState.inputModes
       }, null, 2);
       const url = URL.createObjectURL(new Blob([data], { type: 'application/json' }));
       const a = document.createElement('a');
@@ -1048,6 +1122,7 @@
           const rungs = sanitizeRungs(Array.isArray(data) ? data : data.rungs);
           History.checkpoint();
           ladderProgram.rungs = rungs;
+          if (data.tags) currentTags = Object.assign({}, defaultTags, data.tags);
           selectedNodeId = null;
           this.resetRuntimeKeepInputs();
           this.commit();
@@ -1058,6 +1133,12 @@
       };
       reader.onerror = () => toast('Erro ao ler o arquivo.', 'error');
       reader.readAsText(file);
+    },
+
+    handleImportProgram(event) {
+      const file = event.target.files && event.target.files[0];
+      if (file) this.importProgram(file);
+      event.target.value = '';
     },
 
     selectNode(id) {
@@ -1115,7 +1196,7 @@
     },
 
     createNodeObject(type) {
-      if (type === 'PARALLEL') return PAR([], []);
+      if (type === 'PARALLEL' || type === 'BRANCH') return PAR([], []);
       const node = { id: uid(), type, target: this.suggestTag(type) };
       if (type === 'TON') node.pt = 3;
       if (type === 'CTU') node.pv = 3;
@@ -1124,7 +1205,7 @@
 
     placeNode(seqInfo, index, payload) {
       if (payload.kind === 'new') {
-        if (payload.type === 'PARALLEL' && seqInfo.depth + 1 > CONFIG.maxParallelDepth) {
+        if ((payload.type === 'PARALLEL' || payload.type === 'BRANCH') && seqInfo.depth + 1 > CONFIG.maxParallelDepth) {
           toast(`Limite de ${CONFIG.maxParallelDepth} níveis de ramos paralelos.`); return false;
         }
         const node = this.createNodeObject(payload.type);
@@ -1140,7 +1221,7 @@
       if (seqInfo.depth + nestingDepth(loc.node) > CONFIG.maxParallelDepth) {
         toast(`Limite de ${CONFIG.maxParallelDepth} níveis de ramos paralelos.`); return false;
       }
-      if (loc.node.type === 'PARALLEL') {
+      if (loc.node.type === 'PARALLEL' || loc.node.type === 'BRANCH') {
         const inside = [];
         walkNodes([loc.node], (n) => inside.push(n));
         if (inside.some((n) => n.branches && n.branches.includes(seqInfo.array))) return false;
@@ -1155,6 +1236,10 @@
       selectedNodeId = loc.node.id;
       this.commit();
       return true;
+    },
+
+    addInstructionToRung(type) {
+      this.addFromPalette(type);
     },
 
     addFromPalette(type) {
@@ -1255,7 +1340,7 @@
       if (!payload && e.dataTransfer) {
         const txt = e.dataTransfer.getData('text/plain') || '';
         if (txt.startsWith('move:')) payload = { kind: 'move', id: txt.slice(5) };
-        else if (txt === 'PARALLEL' || TYPE_META[txt]) payload = { kind: 'new', type: txt };
+        else if (txt === 'PARALLEL' || txt === 'BRANCH' || TYPE_META[txt]) payload = { kind: 'new', type: txt === 'BRANCH' ? 'PARALLEL' : txt };
       }
       this.endDrag();
       if (!seqEl || !payload) return;
@@ -1286,14 +1371,19 @@
       const title = modal.querySelector('.config-modal-title');
       if (title) title.textContent = `⚙️ ${meta.name}`;
 
-      primaryInput.value = node.target || '';
+      let initialVal = node.target || '';
+      if (currentTags[initialVal] && currentTags[initialVal].name) {
+        initialVal = currentTags[initialVal].name;
+      }
+
+      primaryInput.value = initialVal;
       primaryInput.setAttribute('autocomplete', 'off');
       primaryInput.setAttribute('spellcheck', 'false');
       primaryInput.setAttribute('placeholder', meta.areas.map(areaRangeText).join(' / '));
 
       let dl = document.getElementById('ladder-address-list');
       if (!dl) { dl = document.createElement('datalist'); dl.id = 'ladder-address-list'; document.body.appendChild(dl); }
-      dl.innerHTML = allAddressesFor(node.type).map((a) => `<option value="${a}"></option>`).join('');
+      dl.innerHTML = allAddressesFor(node.type).map((a) => `<option value="${a}">${getTagName(a)}</option>`).join('');
       primaryInput.setAttribute('list', 'ladder-address-list');
 
       if (paramGroup && paramInput && paramLabel) {
@@ -1341,11 +1431,14 @@
 
     saveModalConfig() {
       if (!editingNode) return;
-      const tagValue = document.getElementById('config-primary-tag').value;
+      let rawValue = document.getElementById('config-primary-tag').value.trim().toUpperCase();
       const paramEl = document.getElementById('config-param-val');
       const paramVal = paramEl ? paramEl.value.trim() : '';
 
-      const v = validateAddress(editingNode.type, tagValue);
+      let matchedAddr = Object.keys(currentTags).find((addr) => currentTags[addr].name.toUpperCase() === rawValue);
+      if (matchedAddr) rawValue = matchedAddr;
+
+      const v = validateAddress(editingNode.type, rawValue);
       if (!v.ok) { this.setModalError(v.error); return; }
 
       let pt; let pv;
@@ -1435,18 +1528,18 @@
 
     detectPaletteType(item) {
       const direct = item.dataset.type || item.dataset.nodeType || item.dataset.component;
-      if (direct && (TYPE_META[direct] || direct === 'PARALLEL')) return direct;
+      if (direct && (TYPE_META[direct] || direct === 'PARALLEL' || direct === 'BRANCH')) return direct === 'BRANCH' ? 'PARALLEL' : direct;
 
       const inline = item.getAttribute('ondragstart') || '';
       const m = inline.match(/['"]([A-Z_]+)['"]/);
-      if (m && (TYPE_META[m[1]] || m[1] === 'PARALLEL')) return m[1];
+      if (m && (TYPE_META[m[1]] || m[1] === 'PARALLEL' || m[1] === 'BRANCH')) return m[1] === 'BRANCH' ? 'PARALLEL' : m[1];
 
       const labelEl = item.querySelector('.palette-label');
       const text = ((labelEl ? labelEl.textContent : item.textContent) || '').toLowerCase();
       if (text.includes('paralelo') || text.includes('selo')) return 'PARALLEL';
       if (text.includes('reset')) return 'RESET';
       if (text.includes('set')) return 'SET';
-      if (text.includes('direta')) return 'COIL';
+      if (text.includes('direta') || text.includes('bobina')) return 'COIL';
       if (text.includes('contato na')) return 'NO';
       if (text.includes('contato nf')) return 'NC';
       if (text.includes('pulso') || text.includes('borda')) return 'P_EDGE';
@@ -1456,7 +1549,7 @@
     },
 
     bindPalette() {
-      document.querySelectorAll('.palette-item').forEach((item) => {
+      document.querySelectorAll('.palette-item, .btn-palette').forEach((item) => {
         const type = this.detectPaletteType(item);
         if (!type) return;
         bindOnce(item, 'palette', () => {
@@ -1464,7 +1557,6 @@
           item.setAttribute('draggable', 'true');
           item.setAttribute('tabindex', '0');
           item.setAttribute('role', 'button');
-          item.title = 'Arraste para a linha ou clique para inserir';
           item.addEventListener('dragstart', (e) => this.handleDragStart(e, type));
           item.addEventListener('dragend', () => this.endDrag());
           item.addEventListener('click', () => this.addFromPalette(type));

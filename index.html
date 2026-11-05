@@ -5,6 +5,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Catálogo & Simulador CLP</title>
+  
+  <!-- Suporte a PWA / Standalone -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/catalog.css">
@@ -159,6 +167,7 @@
           <button id="btn-plc-run" class="btn-plc btn-plc-run">▶ RUN</button>
           <button id="btn-plc-stop" class="btn-plc btn-plc-stop">⏹ STOP</button>
           <button id="btn-plc-reset" class="btn-plc btn-plc-reset">🔄 RESET</button>
+          <button id="btn-open-tags-modal" class="btn-plc btn-plc-tag" onclick="SimulatorModule.openTagsModal()" title="Gerenciar nomes simbólicos das variáveis">🏷️ Tabela de Tags</button>
         </div>
       </div>
 
@@ -173,74 +182,49 @@
 
     <!-- Editor de Lógica Ladder -->
     <section class="ladder-editor-container">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem;">
         <h3>Editor de Lógica Ladder</h3>
-        <button id="btn-add-rung" class="btn-plc btn-plc-run" style="font-size: 0.8rem;">+ Nova Linha (Rung)</button>
+        <div style="display: flex; gap: 0.5rem;">
+          <button id="btn-export-ladder" class="btn-plc" onclick="SimulatorModule.exportProgram()" title="Exportar projeto Ladder">📤 Exportar</button>
+          <button id="btn-import-ladder" class="btn-plc" onclick="document.getElementById('input-import-ladder').click()" title="Importar projeto Ladder">📥 Importar</button>
+          <input type="file" id="input-import-ladder" accept=".json" style="display: none;" onchange="SimulatorModule.handleImportProgram(event)">
+          <button id="btn-add-rung" class="btn-plc btn-plc-run" style="font-size: 0.8rem;">+ Nova Linha (Rung)</button>
+        </div>
       </div>
 
       <div class="ladder-layout-grid">
 
         <!-- Paleta Lateral de Instruções -->
         <aside class="palette-panel">
-
+          <div>
+            <div class="palette-category-title">Estruturas</div>
+            <div class="palette-items-group">
+              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('BRANCH')" title="Cria um ramo em paralelo (circuito de selo ou bypass)">🔀 Ramo paralelo / Selo</button>
+            </div>
+          </div>
           <div>
             <div class="palette-category-title">Contatos / Entradas</div>
             <div class="palette-items-group">
-              <div class="palette-item" draggable="true" ondragstart="SimulatorModule.handleDragStart(event, 'NO')">
-                <span class="palette-symbol">| |</span>
-                <span class="palette-label">Contato NA</span>
-              </div>
-              <div class="palette-item" draggable="true" ondragstart="SimulatorModule.handleDragStart(event, 'NC')">
-                <span class="palette-symbol">| / |</span>
-                <span class="palette-label">Contato NF</span>
-              </div>
-              <div class="palette-item" draggable="true" ondragstart="SimulatorModule.handleDragStart(event, 'P_EDGE')">
-                <span class="palette-symbol">| P |</span>
-                <span class="palette-label">Pulso (Borda)</span>
-              </div>
+              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('NO')" title="Contato Normalmente Aberto (Ex: Botoeira Liga)">┤ ├ Contato NA</button>
+              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('NC')" title="Contato Normalmente Fechado (Ex: Botoeira Desliga)">┤/├ Contato NF</button>
+              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('PULSE')" title="Detector de borda de subida (Pulso)">┤P├ Pulso (Borda)</button>
             </div>
           </div>
 
           <div>
-            <div class="palette-category-title">Lógica de Selo</div>
+            <div class="palette-category-title">Saídas / Bobinas</div>
             <div class="palette-items-group">
-              <div class="palette-item" draggable="true"
-                ondragstart="SimulatorModule.handleDragStart(event, 'PARALLEL')">
-                <span class="palette-symbol">|| (Selo)</span>
-                <span class="palette-label">Ramo Paralelo</span>
-              </div>
+              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('COIL')" title="Bobina Direta de Saída">( ) Bobina</button>
+              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('SET')" title="Bobina de Retenção (Mantém saída ligada até acionar RESET)">(S) Bobina SET</button>
+              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('RESET')" title="Bobina de Desativação (Reseta saída tipo SET)">(R) Bobina RESET</button>
             </div>
           </div>
 
           <div>
-            <div class="palette-category-title">Saídas / Atuadores</div>
+            <div class="palette-category-title">Temporizadores & Contadores</div>
             <div class="palette-items-group">
-              <div class="palette-item" draggable="true" ondragstart="SimulatorModule.handleDragStart(event, 'COIL')">
-                <span class="palette-symbol">( )</span>
-                <span class="palette-label">Bobina Direta</span>
-              </div>
-              <div class="palette-item" draggable="true" ondragstart="SimulatorModule.handleDragStart(event, 'SET')">
-                <span class="palette-symbol">( S )</span>
-                <span class="palette-label">Bobina SET</span>
-              </div>
-              <div class="palette-item" draggable="true" ondragstart="SimulatorModule.handleDragStart(event, 'RESET')">
-                <span class="palette-symbol">( R )</span>
-                <span class="palette-label">Bobina RESET</span>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <div class="palette-category-title">Avançados</div>
-            <div class="palette-items-group">
-              <div class="palette-item" draggable="true" ondragstart="SimulatorModule.handleDragStart(event, 'TON')">
-                <span class="palette-symbol">[ TON ]</span>
-                <span class="palette-label">Temporizador</span>
-              </div>
-              <div class="palette-item" draggable="true" ondragstart="SimulatorModule.handleDragStart(event, 'CTU')">
-                <span class="palette-symbol">[ CTU ]</span>
-                <span class="palette-label">Contador</span>
-              </div>
+              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('TON')" title="Temporizador com Retardo na Energização">[TON] Retardo Liga</button>
+              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('CTU')" title="Contador Crescente de Pulsos">[CTU] Contagem Up</button>
             </div>
           </div>
 
@@ -284,6 +268,38 @@
     </div>
   </div>
 
+  <!-- MODAL DA TABELA DE VARIÁVEIS (TAGS) -->
+  <div id="modal-tags-manager" class="modal-overlay">
+    <div class="modal-card modal-large" style="max-width: 700px; background-color: var(--bg-primary); padding: 1.5rem; border-radius: 8px;">
+      <div class="modal-header" style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+        <h3 style="margin: 0; color: var(--text-primary);">🏷️ Tabela de Variáveis (Tags)</h3>
+        <button class="modal-close" onclick="SimulatorModule.closeTagsModal()" style="background: none; border: none; font-size: 1.5rem; color: var(--text-secondary); cursor: pointer;">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc" style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">Defina nomes simbólicos (ex: BOTAO_LIGA, MOTOR_01) e comentários para os endereços do CLP.</p>
+        <div class="tags-table-container">
+          <table class="tags-table">
+            <thead>
+              <tr>
+                <th>Endereço</th>
+                <th>Tipo</th>
+                <th>Nome Simbólico (Tag)</th>
+                <th>Comentário / Função</th>
+              </tr>
+            </thead>
+            <tbody id="tags-table-body">
+              <!-- Gerado dinamicamente pelo JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.5rem;">
+        <button class="btn-plc" onclick="SimulatorModule.closeTagsModal()">Cancelar</button>
+        <button class="btn-plc btn-plc-run" onclick="SimulatorModule.saveTagsFromModal()">Salvar Tags</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Navegação Inferior -->
   <nav class="tab-navigation">
     <button class="tab-btn active" data-tab="catalog">
@@ -303,9 +319,9 @@
 
   <!-- Scripts -->
   <script src="js/data.js"></script>
-  <script src="js/simulator.js"></script>
   <script src="js/catalog.js"></script>
   <script src="js/storage.js"></script>
+  <script src="js/simulator.js"></script>
   <script src="js/app.js"></script>
 </body>
 
