@@ -4507,3 +4507,93 @@ const EQUIPMENT_PRESETS = {
     ]
   }
 };
+
+/**
+ * AUTO TECH HUB — BANCO DE DADOS DE EQUIPAMENTOS INDUSTRIAIS (FASE 3)
+ */
+const CATALOG_DATA = {
+  categories: [
+    { id: "automação", name: "Automação & CLP", icon: "💻", desc: "Controladores programáveis, I/Os e IHMs" },
+    { id: "comandos", name: "Comandos Elétricos", icon: "⚡", desc: "Contatores, relés térmicos, disjuntores e botoeiras" },
+    { id: "sensores", name: "Sensores de Campo", icon: "📡", desc: "Indutivos, capacitivos, fotoelétricos e ultrassônicos" },
+    { id: "acionamentos", name: "Acionamentos", icon: "⚙️", desc: "Inversores de frequência e soft-starters" },
+    { id: "pneumatica", name: "Pneumática", icon: "💨", desc: "Válvulas solenoides, atuadores e blocos manifolds" },
+    { id: "atuadores", name: "Atuadores Mecânicos", icon: "🦾", desc: "Motores elétricos, servomotores e cilindros" },
+    { id: "favoritos", name: "Meus Favoritos", icon: "⭐", desc: "Seus equipamentos salvos para consulta rápida" }
+  ],
+  equipments: [
+    {
+      id: "eq-001",
+      name: "Sensor Indutivo M12 PNP NA",
+      category: "sensores",
+      manufacturer: "Balluff",
+      shortDesc: "Detecção metálica sem contato com alcance de 4mm.",
+      purpose: "Detectar a presença de peças metálicas em esteiras e posicionamento de máquinas sem atrito mecânico.",
+      simpleHow: "Funciona como um ímã inteligente: quando um metal chega perto, ele percebe a alteração no campo magnético e envia um sinal de 24V para o CLP.",
+      techHow: "Gera um campo eletromagnético de alta frequência na face sensora. A aproximação de um condutor metálico reduz a amplitude de oscilação do circuito interno, acionando o transistor de saída PNP.",
+      voltage: "24VDC",
+      current: "200mA",
+      power: "4.8W",
+      ipRating: "IP67",
+      outputType: "PNP NA",
+      apps: ["Contagem de peças na esteira", "Fim de curso sem contato", "Confirmação de trava de segurança"],
+      specsTable: {
+        "Distância de Comutação": "4 mm",
+        "Rosca": "M12 x 1",
+        "Frequência de Resposta": "1000 Hz",
+        "Material do Corpo": "Latão Niquelado",
+        "Conexão": "Conector M12 4 pinos"
+      },
+      diagramImg: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=500&auto=format&fit=crop&q=60",
+      datasheetUrl: "https://www.balluff.com"
+    },
+    {
+      id: "eq-002",
+      name: "Contator Tripolar 18A 24VDC",
+      category: "comandos",
+      manufacturer: "WEG",
+      shortDesc: "Chaveamento de motores elétricos trifásicos até 10 CV.",
+      purpose: "Ligar e desligar motores elétricos de alta potência com segurança a partir de um sinal de baixa potência do CLP.",
+      simpleHow: "É um interruptor elétrico gigante acionado por um eletroímã. Quando o CLP manda 24V para a bobina, ele puxa os contatos internos e liga o motor.",
+      techHow: "Uma bobina eletromagnética energizada em 24VDC atrai um núcleo de ferro móvel, fechando simultaneamente 3 contatos de potência (L1-T1, L2-T2, L3-T3) e contatos auxiliares.",
+      voltage: "220V/380VAC (Bobina 24VDC)",
+      current: "18A",
+      power: "7.5kW / 10CV",
+      ipRating: "IP20",
+      outputType: "Relé",
+      apps: ["Partida direta de motores", "Chaveamento de resistências industriais", "Inversão de rotação"],
+      specsTable: {
+        "Categoria de Uso": "AC-3",
+        "Contatos Auxiliares": "1NA + 1NF",
+        "Fixação": "Trilho DIN 35mm / Parafuso",
+        "Vida Útil Mecânica": "10 milhões de operações"
+      },
+      diagramImg: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500&auto=format&fit=crop&q=60",
+      datasheetUrl: "https://www.weg.net"
+    },
+    {
+      id: "eq-003",
+      name: "Inversor de Frequência 3CV 380V",
+      category: "acionamentos",
+      manufacturer: "Siemens",
+      shortDesc: "Controle preciso de velocidade e torque para motores trifásicos.",
+      purpose: "Ajustar a velocidade de rotação de motores elétricos, reduzindo picos de corrente e economizando energia.",
+      simpleHow: "Funciona como um acelerador eletrônico de carro para o motor da fábrica, permitindo subir ou descer a velocidade suavemente.",
+      techHow: "Converte a tensão alternada da rede em contínua (rectificação), e depois sintetiza uma nova tensão alternada com frequência e amplitude variáveis através de transistores IGBT (inversão PWM).",
+      voltage: "380VAC",
+      current: "7.3A",
+      power: "2.2kW / 3CV",
+      ipRating: "IP20",
+      outputType: "PWM / Analógico",
+      apps: ["Esteiras com velocidade variável", "Controle de vazão em bombas", "Sistemas de exaustão"],
+      specsTable: {
+        "Modo de Controle": "V/f e Vetorial",
+        "Entradas Analógicas": "2x (0-10V / 4-20mA)",
+        "Comunicação": "Modbus RTU / Profinet",
+        "Sobrecarga": "150% por 60 segundos"
+      },
+      diagramImg: "https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=500&auto=format&fit=crop&q=60",
+      datasheetUrl: "https://www.siemens.com"
+    }
+  ]
+};
