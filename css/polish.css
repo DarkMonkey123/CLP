@@ -108,6 +108,16 @@ textarea:focus-visible,
   border: 1px solid var(--border-color);
 }
 
+.btn-install-app {
+  min-height: 40px;
+  background: var(--success-color);
+  color: #fff;
+}
+
+#btn-install-app[hidden] {
+  display: none;
+}
+
 .compare-count {
   display: inline-grid;
   min-width: 1.35rem;
@@ -795,12 +805,12 @@ textarea:focus-visible,
 
 @media (max-width: 700px) {
   body {
-    padding-bottom: 90px;
+    padding-bottom: calc(90px + env(safe-area-inset-bottom));
   }
 
   .app-header {
-    min-height: 60px;
-    padding: 0.55rem 0.8rem;
+    min-height: calc(60px + env(safe-area-inset-top));
+    padding: calc(0.55rem + env(safe-area-inset-top)) 0.8rem 0.55rem;
   }
 
   .logo-container h1 {
@@ -817,6 +827,12 @@ textarea:focus-visible,
   }
 
   .header-compare {
+    min-height: 38px;
+    padding: 0.4rem 0.55rem;
+    font-size: 0.72rem;
+  }
+
+  .btn-install-app {
     min-height: 38px;
     padding: 0.4rem 0.55rem;
     font-size: 0.72rem;
@@ -1127,27 +1143,113 @@ textarea:focus-visible,
 
 @media (max-width: 700px) and (orientation: portrait) {
   #view-simulator.active {
-    display: block;
-    min-height: calc(100dvh - 150px);
-    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    min-height: 0;
+    padding: 1rem 0.9rem 1.5rem;
   }
 
-  #view-simulator > :not(.simulator-rotate-notice) {
+  #view-simulator > .simulator-intro {
+    display: block;
+    order: 0;
+  }
+
+  #view-simulator .simulator-rotate-notice {
     display: none !important;
   }
 
-  #view-simulator > .simulator-rotate-notice {
-    display: grid;
-    min-height: calc(100dvh - 190px);
-    align-content: center;
-    justify-items: center;
-    gap: 0.6rem;
-    padding: 1.5rem;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    background: var(--bg-card);
-    box-shadow: var(--shadow-sm);
-    text-align: center;
+  #view-simulator > .plc-scenario-panel,
+  #view-simulator > .plc-hardware-panel,
+  #view-simulator > .ladder-editor-container,
+  #view-simulator > .trace-panel-container {
+    position: static;
+    order: initial;
+    width: 100%;
+    max-height: none;
+    min-height: 0;
+    overflow: visible;
+    margin: 0 !important;
+  }
+
+  #view-simulator > .plc-scenario-panel {
+    order: 1;
+    padding: 0.85rem !important;
+  }
+
+  #view-simulator .plc-scenario-panel > div:first-child {
+    align-items: stretch !important;
+  }
+
+  #view-simulator .plc-scenario-panel > div:first-child > h3 {
+    display: flex !important;
+  }
+
+  #view-simulator .plc-scenario-panel > div:first-child > div {
+    width: 100%;
+  }
+
+  #view-simulator .plc-scenario-panel #select-scenario,
+  #view-simulator .plc-scenario-panel #btn-load-scenario-preset {
+    flex: 1 1 100%;
+    width: 100%;
+    min-width: 0;
+  }
+
+  #view-simulator .plc-scenario-panel > div[style*="grid-template-columns"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  #view-simulator #scenario-stage-wrapper {
+    min-height: 120px !important;
+  }
+
+  #view-simulator #scenario-svg {
+    height: 110px !important;
+  }
+
+  #view-simulator > .plc-hardware-panel {
+    order: 2;
+    padding: 0.85rem;
+  }
+
+  #view-simulator > .ladder-editor-container {
+    order: 3;
+    padding: 0.85rem !important;
+  }
+
+  #view-simulator > .trace-panel-container {
+    order: 4;
+  }
+
+  #view-simulator .ladder-editor-container > div:first-child {
+    align-items: stretch !important;
+  }
+
+  #view-simulator .ladder-editor-container > div:first-child > div {
+    flex-wrap: wrap;
+  }
+
+  #view-simulator .ladder-layout-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #view-simulator .ladder-workspace-panel {
+    min-width: 0;
+    padding: 0.65rem;
+  }
+
+  #view-simulator .ladder-toolbar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+
+  #view-simulator .ladder-toolbar > * {
+    flex: 0 0 auto;
+  }
+
+  #view-simulator .ladder-rungs {
+    overflow-x: auto;
   }
 
   .simulator-rotate-notice > span {

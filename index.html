@@ -3,12 +3,12 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>AutoTech Hub — Catálogo & Simulador CLP</title>
   
   <!-- Suporte a PWA / Standalone -->
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0f172a">
+  <meta name="theme-color" content="#f3f6fb">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -33,6 +33,7 @@
       <h1>AutoTech Hub</h1>
     </div>
     <div class="header-actions">
+      <button type="button" id="btn-install-app" class="btn-plc btn-install-app" hidden>⬇️ Instalar app</button>
       <button type="button" class="btn-plc header-compare" onclick="CatalogModule.openComparatorModal()" title="Comparar equipamentos selecionados">⚖️ Comparador <span id="compare-count" class="compare-count">0</span></button>
       <button type="button" id="btn-theme-toggle" class="btn-icon" title="Alternar tema" aria-label="Alternar tema">🌙</button>
     </div>

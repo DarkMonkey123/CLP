@@ -2,6 +2,29 @@
  * Inicializador da Aplicação & Gerenciador de Roteamento SPA
  */
 document.addEventListener('DOMContentLoaded', () => {
+  const installButton = document.getElementById('btn-install-app');
+  let deferredInstallPrompt = null;
+
+  window.addEventListener('beforeinstallprompt', event => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    installButton.hidden = false;
+  });
+
+  installButton.addEventListener('click', async () => {
+    if (!deferredInstallPrompt) return;
+
+    await deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    installButton.hidden = true;
+  });
+
+  window.addEventListener('appinstalled', () => {
+    deferredInstallPrompt = null;
+    installButton.hidden = true;
+  });
+
   // 1. Inicializar Módulos
   CatalogModule.init();
   SimulatorModule.init();

@@ -2,15 +2,20 @@
   "short_name": "PLC App",
   "name": "Simulador e Catálogo CLP",
   "start_url": "./index.html",
-  "background_color": "#0f172a",
-  "theme_color": "#0f172a",
+  "scope": "./",
+  "background_color": "#f3f6fb",
+  "theme_color": "#f3f6fb",
+  "display_override": [
+    "fullscreen",
+    "standalone"
+  ],
   "display": "standalone",
   "orientation": "any",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2942/2942544.png",
-      "type": "image/png",
-      "sizes": "512x512",
+      "src": "assets/images/app-icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
       "purpose": "any maskable"
     }
   ]
