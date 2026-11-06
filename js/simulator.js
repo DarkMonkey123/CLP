@@ -1204,6 +1204,8 @@
           </div>`;
         }).join('');
       }
+
+      this.updateOutputMonitor();
     },
 
     ensureShell(ws) {
@@ -1352,11 +1354,17 @@
       cpuState.I.forEach((val, idx) => {
         const led = document.getElementById(`led-input-${idx}`);
         if (led) led.classList.toggle('on', val);
+        const inputCard = document.querySelector(`.input-card[data-input="${idx}"]`);
+        if (inputCard) {
+          inputCard.setAttribute('aria-pressed', String(!!val));
+          inputCard.classList.toggle('is-active', !!val);
+        }
       });
       cpuState.Q.forEach((val, idx) => {
         const led = document.getElementById(`led-output-${idx}`);
         if (led) led.classList.toggle('on', val);
       });
+      this.updateOutputMonitor();
 
       const c = this.cache;
       if (!c) return;
@@ -1516,6 +1524,64 @@
       if (typeof CatalogModule !== 'undefined' && typeof CatalogModule.renderBOMTable === 'function') {
         CatalogModule.renderBOMTable();
       }
+    },
+
+    updateOutputMonitor() {
+      const summary = document.getElementById('sim-output-summary');
+      if (!summary) return;
+
+      const activeInputs = cpuState.I
+        .map((value, idx) => value ? `I0.${idx}` : null)
+        .filter(Boolean);
+      const activeOutputs = cpuState.Q
+        .map((value, idx) => value ? `Q0.${idx}` : null)
+        .filter(Boolean);
+      const signature = JSON.stringify({
+        mode: cpuState.mode,
+        inputs: activeInputs,
+        outputs: activeOutputs,
+        inputTags: activeInputs.map(getTagName),
+        outputTags: activeOutputs.map(getTagName)
+      });
+      const monitor = summary.closest('.sim-feedback-monitor');
+      if (monitor?.dataset.stateSignature === signature) return;
+      if (monitor) monitor.dataset.stateSignature = signature;
+
+      const mode = document.getElementById('sim-feedback-mode');
+      const count = document.getElementById('sim-output-count');
+      if (mode) {
+        mode.textContent = cpuState.mode;
+        mode.dataset.mode = cpuState.mode;
+      }
+      if (count) count.textContent = `${activeOutputs.length} de ${cpuState.Q.length} saídas`;
+
+      const renderSignals = (addresses) => addresses.length
+        ? addresses.map((addr) => `
+            <span class="sim-feedback-chip">
+              <code>${esc(addr)}</code>
+              <span>${esc(getTagName(addr))}</span>
+            </span>`).join('')
+        : '<span class="sim-feedback-empty">Nenhuma</span>';
+
+      const message = cpuState.mode === 'STOP'
+        ? 'CLP parado. Pressione RUN para executar a lógica.'
+        : activeOutputs.length
+          ? 'A lógica está acionando as saídas abaixo.'
+          : activeInputs.length
+            ? 'Entrada ativa, mas nenhuma saída está ligada. Confira a lógica Ladder.'
+            : 'Acione uma entrada para acompanhar a resposta aqui.';
+
+      summary.innerHTML = `
+        <p class="sim-feedback-message">${message}</p>
+        <div class="sim-feedback-row">
+          <span class="sim-feedback-label">Entradas ativas</span>
+          <div class="sim-feedback-signals">${renderSignals(activeInputs)}</div>
+        </div>
+        <div class="sim-feedback-row">
+          <span class="sim-feedback-label">Saídas ligadas</span>
+          <div class="sim-feedback-signals">${renderSignals(activeOutputs)}</div>
+        </div>`;
+      if (monitor) monitor.classList.toggle('has-active-output', activeOutputs.length > 0);
     },
 
     unlinkEquipment(address) {
