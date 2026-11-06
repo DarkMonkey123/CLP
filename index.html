@@ -215,7 +215,7 @@
 
   <!-- MÓDULO 4: SIMULADOR DE CLP -->
   <main id="view-simulator" class="view-section" role="tabpanel" aria-labelledby="tab-simulator" hidden>
-    <section class="page-intro">
+    <section class="page-intro simulator-intro">
       <span class="page-eyebrow">LABORATÓRIO VIRTUAL</span>
       <h2>Simulador de CLP</h2>
       <p>Teste entradas, observe saídas e desenvolva sua lógica Ladder.</p>
@@ -237,17 +237,36 @@
         </div>
       </div>
 
-      <!-- Entradas Digitais -->
-      <div class="io-section-title">Entradas Digitais (I0.0 - I0.7)</div>
-      <div id="plc-inputs-container" class="io-grid"></div>
+      <section class="sim-feedback-monitor" aria-label="Resultado atual da simulação">
+        <div class="sim-feedback-header">
+          <div class="sim-feedback-title">
+            <span class="sim-feedback-pulse" aria-hidden="true"></span>
+            <strong>Resposta da simulação</strong>
+          </div>
+          <span id="sim-feedback-mode" class="sim-feedback-mode">RUN</span>
+          <span id="sim-output-count" class="sim-output-count">0 de 8 saídas</span>
+        </div>
+        <div id="sim-output-summary" class="sim-feedback-content" role="status" aria-live="polite" aria-atomic="true">
+          Acione uma entrada para acompanhar aqui o resultado da lógica.
+        </div>
+      </section>
 
-      <!-- Entradas Analógicas -->
-      <div class="io-section-title">Entradas Analógicas (IW0 - IW1: 0–10 V / 4–20 mA)</div>
-      <div id="plc-analog-container" class="io-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.8rem;"></div>
+      <div class="sim-io-primary">
+        <section class="sim-io-group">
+          <div class="io-section-title">Entradas digitais <span>I0.0–I0.7</span></div>
+          <div id="plc-inputs-container" class="io-grid"></div>
+        </section>
 
-      <!-- Saídas Digitais -->
-      <div class="io-section-title" style="margin-top: 1rem;">Saídas Digitais (Q0.0 - Q0.7)</div>
-      <div id="plc-outputs-container" class="io-grid"></div>
+        <section class="sim-io-group">
+          <div class="io-section-title">Saídas digitais <span>Q0.0–Q0.7</span></div>
+          <div id="plc-outputs-container" class="io-grid"></div>
+        </section>
+      </div>
+
+      <section class="sim-analog-group">
+        <div class="io-section-title">Entradas analógicas <span>IW0–IW1 · 0–10 V / 4–20 mA</span></div>
+        <div id="plc-analog-container" class="io-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.8rem;"></div>
+      </section>
     </section>
 
     <!-- PAINEL DE CENÁRIOS DE PROCESSO ANIMADOS -->
