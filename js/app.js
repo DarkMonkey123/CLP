@@ -13,12 +13,22 @@ document.addEventListener('DOMContentLoaded', () => {
   tabButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       const targetTab = btn.dataset.tab;
+      const targetView = document.getElementById(`view-${targetTab}`);
+      if (!targetView) return;
 
-      tabButtons.forEach(b => b.classList.remove('active'));
-      viewSections.forEach(s => s.classList.remove('active'));
+      tabButtons.forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
+      viewSections.forEach(s => {
+        s.classList.remove('active');
+        s.setAttribute('hidden', '');
+      });
 
       btn.classList.add('active');
-      document.getElementById(`view-${targetTab}`).classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+      targetView.classList.add('active');
+      targetView.removeAttribute('hidden');
 
       // Se mudar para a aba do simulador, reconstrói o DOM com segurança
       if (targetTab === 'simulator') {
@@ -31,7 +41,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const themeBtn = document.getElementById('btn-theme-toggle');
   const htmlTag = document.documentElement;
 
-  const savedTheme = localStorage.getItem('autotech_theme') || 'light';
+  let savedTheme = 'light';
+  try {
+    savedTheme = localStorage.getItem('autotech_theme') === 'dark' ? 'dark' : 'light';
+  } catch (error) {
+    // The app still works when browser storage is unavailable.
+  }
   htmlTag.setAttribute('data-theme', savedTheme);
   themeBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
 
@@ -40,7 +55,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const newTheme = currentTheme === 'light' ? 'dark' : 'light';
 
     htmlTag.setAttribute('data-theme', newTheme);
-    localStorage.setItem('autotech_theme', newTheme);
+    try {
+      localStorage.setItem('autotech_theme', newTheme);
+    } catch (error) {
+      // Keep the selected theme for this session if storage is unavailable.
+    }
     themeBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+    themeBtn.setAttribute('aria-label', `Ativar tema ${newTheme === 'dark' ? 'claro' : 'escuro'}`);
   });
 });
