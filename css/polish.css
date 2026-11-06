@@ -446,6 +446,219 @@ textarea:focus-visible,
   border-bottom: 1px solid var(--border-color);
 }
 
+.simulator-intro {
+  margin-bottom: 0.9rem;
+}
+
+.simulator-intro .page-eyebrow {
+  margin-bottom: 0.25rem;
+}
+
+.simulator-intro p {
+  margin-top: 0.3rem;
+}
+
+.sim-feedback-monitor {
+  position: sticky;
+  top: 76px;
+  z-index: 90;
+  margin: 0 0 0.9rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--accent-color);
+  border-radius: 15px;
+  background: color-mix(in srgb, var(--bg-card) 96%, var(--accent-color));
+  box-shadow: var(--shadow-md);
+}
+
+.sim-feedback-monitor.has-active-output {
+  border-left-color: var(--success-color);
+}
+
+.sim-feedback-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.55rem;
+}
+
+.sim-feedback-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: auto;
+  color: var(--text-primary);
+  font-size: 0.83rem;
+}
+
+.sim-feedback-pulse {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--success-color);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--success-color) 14%, transparent);
+}
+
+.sim-feedback-mode,
+.sim-output-count {
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.sim-feedback-mode[data-mode="STOP"] {
+  border-color: color-mix(in srgb, var(--danger-color) 45%, var(--border-color));
+  color: var(--danger-color);
+}
+
+.sim-output-count {
+  color: var(--accent-color);
+}
+
+.sim-feedback-content {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.sim-feedback-message {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+
+.sim-feedback-row {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  align-items: start;
+  gap: 0.45rem;
+}
+
+.sim-feedback-label {
+  padding-top: 0.2rem;
+  color: var(--text-secondary);
+  font-size: 0.69rem;
+  font-weight: 700;
+}
+
+.sim-feedback-signals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.sim-feedback-chip {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.45rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.68rem;
+}
+
+.sim-feedback-chip code {
+  color: var(--accent-color);
+  font-family: var(--font-mono);
+  font-weight: 800;
+}
+
+.sim-feedback-chip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sim-feedback-empty {
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+}
+
+.sim-io-primary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 0.9rem;
+}
+
+.sim-io-group {
+  min-width: 0;
+  padding: 0.8rem;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--bg-card) 75%, var(--bg-primary));
+}
+
+.sim-io-group .io-section-title,
+.sim-analog-group .io-section-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 0 0 0.6rem;
+  font-size: 0.72rem;
+}
+
+.sim-io-group .io-section-title span,
+.sim-analog-group .io-section-title span {
+  color: var(--text-secondary);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.sim-io-group .io-grid {
+  grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+  gap: 0.45rem;
+  margin-bottom: 0;
+}
+
+.sim-io-group .io-card {
+  min-height: 82px;
+  padding: 0.5rem 0.35rem;
+  gap: 0.3rem;
+}
+
+.sim-io-group .input-card.is-active {
+  border-color: var(--success-color);
+  background: color-mix(in srgb, var(--success-color) 9%, var(--bg-card));
+}
+
+.sim-io-group .io-card-tag {
+  max-width: 100%;
+  font-size: 0.62rem;
+}
+
+.sim-io-group .io-label {
+  font-size: 0.75rem;
+}
+
+.sim-io-group .io-mode-btn {
+  font-size: 0.58rem;
+}
+
+.sim-analog-group {
+  margin-top: 0.9rem;
+  padding: 0.8rem;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--bg-card) 75%, var(--bg-primary));
+}
+
+.sim-analog-group .io-grid {
+  margin-bottom: 0;
+}
+
 .plc-lcd-screen {
   min-height: 42px;
   border-radius: 12px;
@@ -602,6 +815,19 @@ textarea:focus-visible,
     font-size: 0.88rem;
   }
 
+  .simulator-intro {
+    margin-bottom: 0.6rem;
+  }
+
+  .simulator-intro .page-eyebrow,
+  .simulator-intro p {
+    display: none;
+  }
+
+  .simulator-intro h2 {
+    font-size: 1.25rem;
+  }
+
   .catalog-actions-bar {
     justify-content: flex-start;
   }
@@ -655,6 +881,57 @@ textarea:focus-visible,
     font-size: 0.74rem;
   }
 
+  .sim-feedback-monitor {
+    top: 66px;
+    margin-inline: -0.15rem;
+    padding: 0.65rem 0.7rem;
+  }
+
+  .sim-feedback-header {
+    gap: 0.35rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .sim-feedback-title {
+    gap: 0.35rem;
+    font-size: 0.74rem;
+  }
+
+  .sim-feedback-mode,
+  .sim-output-count {
+    padding: 0.18rem 0.35rem;
+    font-size: 0.61rem;
+  }
+
+  .sim-feedback-row {
+    grid-template-columns: 88px minmax(0, 1fr);
+    gap: 0.3rem;
+  }
+
+  .sim-feedback-label,
+  .sim-feedback-chip,
+  .sim-feedback-empty {
+    font-size: 0.63rem;
+  }
+
+  .sim-feedback-message {
+    font-size: 0.69rem;
+  }
+
+  .sim-io-primary {
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+  }
+
+  .sim-io-group,
+  .sim-analog-group {
+    padding: 0.65rem;
+  }
+
+  .sim-io-group .io-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
   #view-simulator .plc-scenario-panel > div[style*="grid-template-columns"] {
     grid-template-columns: 1fr !important;
   }
@@ -690,6 +967,34 @@ textarea:focus-visible,
 
   .plc-action-btns .btn-plc {
     font-size: 0.68rem;
+  }
+
+  .sim-feedback-row {
+    grid-template-columns: 78px minmax(0, 1fr);
+  }
+}
+
+@media (max-height: 720px) and (min-width: 701px) {
+  .simulator-intro {
+    margin-bottom: 0.55rem;
+  }
+
+  .simulator-intro .page-eyebrow,
+  .simulator-intro p {
+    display: none;
+  }
+
+  .simulator-intro h2 {
+    font-size: 1.25rem;
+  }
+
+  .plc-hardware-panel {
+    padding: 0.85rem;
+  }
+
+  .plc-hardware-header {
+    margin-bottom: 0.65rem;
+    padding-bottom: 0.65rem;
   }
 }
 
