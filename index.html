@@ -33,7 +33,7 @@
       <h1>AutoTech Hub</h1>
     </div>
     <div class="header-actions">
-      <button type="button" id="btn-install-app" class="btn-plc btn-install-app" hidden>⬇️ Instalar app</button>
+      <button type="button" id="btn-install-app" class="btn-plc btn-install-app">⬇️ Instalar app</button>
       <button type="button" class="btn-plc header-compare" onclick="CatalogModule.openComparatorModal()" title="Comparar equipamentos selecionados">⚖️ Comparador <span id="compare-count" class="compare-count">0</span></button>
       <button type="button" id="btn-theme-toggle" class="btn-icon" title="Alternar tema" aria-label="Alternar tema">🌙</button>
     </div>
@@ -621,6 +621,19 @@
       Simulador CLP
     </button>
   </nav>
+
+  <dialog id="install-help-dialog" class="install-help-dialog" aria-labelledby="install-help-title">
+    <div class="install-help-content">
+      <h2 id="install-help-title">Como instalar o AutoTech Hub</h2>
+      <p>O Chrome não abriu a instalação automática. Você ainda pode instalar pelo menu do navegador:</p>
+      <ol>
+        <li><strong>Android (Chrome):</strong> toque em ⋮ e escolha “Instalar app” ou “Adicionar à tela inicial”.</li>
+        <li><strong>iPhone (Safari):</strong> toque em Compartilhar e escolha “Adicionar à Tela de Início”.</li>
+      </ol>
+      <p>Se o Chrome informar que já está instalado, abra o AutoTech Hub pela tela inicial ou pela lista de apps. Para reinstalar, remova primeiro o app existente e abra novamente este site publicado em HTTPS.</p>
+      <button type="button" id="btn-close-install-help" class="btn-plc btn-plc-run">Entendi</button>
+    </div>
+  </dialog>
 
   <!-- Scripts -->
   <script src="js/data.js"></script>

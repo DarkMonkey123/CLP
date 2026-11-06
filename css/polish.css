@@ -118,6 +118,54 @@ textarea:focus-visible,
   display: none;
 }
 
+.install-help-dialog {
+  width: min(92vw, 520px);
+  max-height: min(85vh, 680px);
+  margin: auto;
+  padding: 0;
+  overflow: auto;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.install-help-dialog::backdrop {
+  background: rgba(8, 15, 28, 0.62);
+  backdrop-filter: blur(4px);
+}
+
+.install-help-content {
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.install-help-content h2 {
+  font-size: 1.2rem;
+}
+
+.install-help-content p,
+.install-help-content li {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.install-help-content ol {
+  display: grid;
+  gap: 0.6rem;
+  padding-left: 1.25rem;
+}
+
+.install-help-content strong {
+  color: var(--text-primary);
+}
+
+.install-help-content .btn-plc {
+  justify-content: center;
+}
+
 .compare-count {
   display: inline-grid;
   min-width: 1.35rem;
@@ -1076,6 +1124,24 @@ textarea:focus-visible,
 }
 
 @media (max-width: 390px) {
+  .header-actions {
+    width: 65%;
+    max-width: 65%;
+    min-width: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .header-actions .btn-plc {
+    white-space: nowrap;
+  }
+
+  .btn-install-app,
+  .header-compare {
+    padding: 0.35rem 0.45rem;
+    font-size: 0.62rem;
+  }
+
   .category-blocks-grid {
     grid-template-columns: 1fr;
   }

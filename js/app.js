@@ -3,27 +3,61 @@
  */
 document.addEventListener('DOMContentLoaded', () => {
   const installButton = document.getElementById('btn-install-app');
+  const installHelpDialog = document.getElementById('install-help-dialog');
   let deferredInstallPrompt = null;
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    || window.matchMedia('(display-mode: fullscreen)').matches
+    || window.navigator.standalone === true;
+
+  if (isStandalone) {
+    installButton.hidden = true;
+  }
 
   window.addEventListener('beforeinstallprompt', event => {
     event.preventDefault();
     deferredInstallPrompt = event;
+    installButton.textContent = '⬇️ Instalar app';
     installButton.hidden = false;
   });
 
   installButton.addEventListener('click', async () => {
-    if (!deferredInstallPrompt) return;
+    if (!deferredInstallPrompt) {
+      installHelpDialog.showModal();
+      return;
+    }
 
-    await deferredInstallPrompt.prompt();
-    await deferredInstallPrompt.userChoice;
-    deferredInstallPrompt = null;
-    installButton.hidden = true;
+    try {
+      const installPrompt = deferredInstallPrompt;
+      deferredInstallPrompt = null;
+      await installPrompt.prompt();
+      const { outcome } = await installPrompt.userChoice;
+
+      if (outcome === 'accepted') {
+        installButton.hidden = true;
+      } else {
+        installButton.textContent = 'Como instalar?';
+      }
+    } catch (error) {
+      console.error('Não foi possível abrir a instalação do app:', error);
+      installButton.textContent = 'Como instalar?';
+      installHelpDialog.showModal();
+    }
+  });
+
+  document.getElementById('btn-close-install-help').addEventListener('click', () => {
+    installHelpDialog.close();
   });
 
   window.addEventListener('appinstalled', () => {
     deferredInstallPrompt = null;
     installButton.hidden = true;
   });
+
+  if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
+    navigator.serviceWorker.register('./sw.js').catch(error => {
+      console.error('Não foi possível registrar o service worker:', error);
+    });
+  }
 
   // 1. Inicializar Módulos
   CatalogModule.init();
