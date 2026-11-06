@@ -1788,6 +1788,23 @@
       ladderProgram.rungs.push(rung);
       activeRungId = rung.id;
       this.commit();
+      requestAnimationFrame(() => {
+        const rungElement = document.querySelector(`.ladder-rung-wrapper[data-rung-id="${CSS.escape(rung.id)}"]`);
+        const rungScroller = document.getElementById('ladder-rungs');
+        if (!rungElement || !rungScroller) return;
+
+        const rungBounds = rungElement.getBoundingClientRect();
+        const scrollerBounds = rungScroller.getBoundingClientRect();
+        const scrollDelta = rungBounds.bottom > scrollerBounds.bottom
+          ? rungBounds.bottom - scrollerBounds.bottom + 8
+          : rungBounds.top < scrollerBounds.top
+            ? rungBounds.top - scrollerBounds.top
+            : 0;
+
+        if (scrollDelta) {
+          rungScroller.scrollBy({ top: scrollDelta, behavior: 'smooth' });
+        }
+      });
     },
 
     removeRung(ref) {

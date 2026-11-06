@@ -1,4 +1,4 @@
-const CACHE_NAME = 'autotech-hub-v1';
+const CACHE_NAME = 'autotech-hub-v7';
 const APP_SHELL = [
   './',
   './index.html',
@@ -21,7 +21,12 @@ const APP_SHELL = [
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(APP_SHELL))
+      .then(cache => Promise.all(APP_SHELL.map(async asset => {
+        const url = new URL(asset, self.registration.scope);
+        const response = await fetch(new Request(url, { cache: 'reload' }));
+        if (!response.ok) throw new Error(`Failed to cache app asset: ${asset}`);
+        await cache.put(url, response);
+      })))
       .then(() => self.skipWaiting())
   );
 });
@@ -56,6 +61,17 @@ self.addEventListener('fetch', event => {
   }
 
   event.respondWith(
-    caches.match(request).then(cachedResponse => cachedResponse || fetch(request))
+    fetch(request)
+      .then(response => {
+        if (response.ok) {
+          event.waitUntil(
+            caches.open(CACHE_NAME)
+              .then(cache => cache.put(request, response.clone()))
+              .catch(error => console.error('Failed to update app asset cache:', error))
+          );
+        }
+        return response;
+      })
+      .catch(() => caches.match(request).then(cachedResponse => cachedResponse || Response.error()))
   );
 });
