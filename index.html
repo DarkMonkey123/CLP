@@ -215,6 +215,11 @@
 
   <!-- MÓDULO 4: SIMULADOR DE CLP -->
   <main id="view-simulator" class="view-section" role="tabpanel" aria-labelledby="tab-simulator" hidden>
+    <div class="simulator-rotate-notice" role="status">
+      <span aria-hidden="true">↻</span>
+      <strong>Gire o celular para continuar</strong>
+      <p>O simulador Ladder foi adaptado para uso em modo paisagem.</p>
+    </div>
     <section class="page-intro simulator-intro">
       <span class="page-eyebrow">LABORATÓRIO VIRTUAL</span>
       <h2>Simulador de CLP</h2>
@@ -308,6 +313,7 @@
           <button id="btn-add-rung" class="btn-plc btn-plc-run" style="font-size: 0.8rem;">+ Nova Linha (Rung)</button>
         </div>
       </div>
+      <p class="ladder-touch-hint">Toque nos contatos I0.x da linha para alternar as entradas. Use a paleta para adicionar elementos.</p>
 
       <!-- PAINEL DE AVISOS DE LÓGICA (LINTER INTERATIVO) -->
       <div id="ladder-linter-summary" class="ladder-linter-summary" style="display: none; margin-bottom: 0.8rem; background-color: var(--bg-card); border: 1px solid var(--border-color); border-left: 4px solid #f59e0b; padding: 0.6rem 1rem; border-radius: var(--radius-sm);">
@@ -324,58 +330,67 @@
           <div>
             <div class="palette-category-title">Estruturas</div>
             <div class="palette-items-group">
-              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('BRANCH')">🔀 Ramo paralelo / Selo</button>
+              <button class="btn-palette" data-node-type="BRANCH" onclick="SimulatorModule.addInstructionToRung('BRANCH')">🔀 Ramo paralelo / Selo</button>
             </div>
           </div>
           <div>
             <div class="palette-category-title">Contatos / Entradas</div>
             <div class="palette-items-group">
-              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('NO')">┤ ├ Contato NA</button>
-              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('NC')">┤/├ Contato NF</button>
-              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('PULSE')">┤P├ Pulso (Borda)</button>
+              <button class="btn-palette" data-node-type="NO" onclick="SimulatorModule.addInstructionToRung('NO')">┤ ├ Contato NA</button>
+              <button class="btn-palette" data-node-type="NC" onclick="SimulatorModule.addInstructionToRung('NC')">┤/├ Contato NF</button>
+              <button class="btn-palette" data-node-type="P_EDGE" onclick="SimulatorModule.addInstructionToRung('P_EDGE')">┤P├ Pulso (Borda)</button>
             </div>
           </div>
 
           <div>
             <div class="palette-category-title">Saídas / Bobinas</div>
             <div class="palette-items-group">
-              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('COIL')">( ) Bobina</button>
-              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('SET')">(S) Bobina SET</button>
-              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('RESET')">(R) Bobina RESET</button>
+              <button class="btn-palette" data-node-type="COIL" onclick="SimulatorModule.addInstructionToRung('COIL')">( ) Bobina</button>
+              <button class="btn-palette" data-node-type="SET" onclick="SimulatorModule.addInstructionToRung('SET')">(S) Bobina SET</button>
+              <button class="btn-palette" data-node-type="RESET" onclick="SimulatorModule.addInstructionToRung('RESET')">(R) Bobina RESET</button>
+            </div>
+          </div>
+          <div>
+            <div class="palette-category-title">Variáveis auxiliares (M)</div>
+            <p class="palette-hint">Use o mesmo endereço M0.x na bobina e nos contatos; linhas anteriores leem a alteração no próximo ciclo.</p>
+            <div class="palette-items-group">
+              <button class="btn-palette" data-node-type="NO" data-node-target="M0.0" onclick="SimulatorModule.addInstructionToRung('NO', 'M0.0')">┤ ├ Contato NA · M0.0</button>
+              <button class="btn-palette" data-node-type="NC" data-node-target="M0.0" onclick="SimulatorModule.addInstructionToRung('NC', 'M0.0')">┤/├ Contato NF · M0.0</button>
+              <button class="btn-palette" data-node-type="COIL" data-node-target="M0.0" onclick="SimulatorModule.addInstructionToRung('COIL', 'M0.0')">( ) Bobina auxiliar · M0.0</button>
             </div>
           </div>
 
           <div>
             <div class="palette-category-title">Temporizadores & Contadores</div>
             <div class="palette-items-group">
-              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('TON')">[TON] Retardo Liga</button>
-              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('TOF')">[TOF] Retardo Desliga</button>
-              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('TP')">[TP] Pulso Fixo</button>
-              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('CTU')">[CTU] Contagem Up</button>
-              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('CTD')">[CTD] Contagem Down</button>
+              <button class="btn-palette" data-node-type="TON" onclick="SimulatorModule.addInstructionToRung('TON')">[TON] Retardo Liga</button>
+              <button class="btn-palette" data-node-type="TOF" onclick="SimulatorModule.addInstructionToRung('TOF')">[TOF] Retardo Desliga</button>
+              <button class="btn-palette" data-node-type="TP" onclick="SimulatorModule.addInstructionToRung('TP')">[TP] Pulso Fixo</button>
+              <button class="btn-palette" data-node-type="CTU" onclick="SimulatorModule.addInstructionToRung('CTU')">[CTU] Contagem Up</button>
+              <button class="btn-palette" data-node-type="CTD" onclick="SimulatorModule.addInstructionToRung('CTD')">[CTD] Contagem Down</button>
             </div>
           </div>
 
           <div>
             <div class="palette-category-title">Comparadores Numéricos</div>
             <div class="palette-items-group">
-              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('EQU')">[ = ] EQU</button>
-              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('NEQ')">[ != ] NEQ</button>
-              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('GRT')">[ > ] GRT</button>
-              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('LES')">[ < ] LES</button>
-              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('GEQ')">[ >= ] GEQ</button>
-              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('LEQ')">[ <= ] LEQ</button>
+              <button class="btn-palette" data-node-type="EQU" onclick="SimulatorModule.addInstructionToRung('EQU')">[ = ] EQU</button>
+              <button class="btn-palette" data-node-type="NEQ" onclick="SimulatorModule.addInstructionToRung('NEQ')">[ != ] NEQ</button>
+              <button class="btn-palette" data-node-type="GRT" onclick="SimulatorModule.addInstructionToRung('GRT')">[ > ] GRT</button>
+              <button class="btn-palette" data-node-type="LES" onclick="SimulatorModule.addInstructionToRung('LES')">[ < ] LES</button>
+              <button class="btn-palette" data-node-type="GEQ" onclick="SimulatorModule.addInstructionToRung('GEQ')">[ >= ] GEQ</button>
+              <button class="btn-palette" data-node-type="LEQ" onclick="SimulatorModule.addInstructionToRung('LEQ')">[ <= ] LEQ</button>
             </div>
           </div>
 
           <div>
             <div class="palette-category-title">Matemática & Memória</div>
             <div class="palette-items-group">
-              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('ADD')">[ + ] ADD</button>
-              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('SUB')">[ - ] SUB</button>
-              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('MUL')">[ * ] MUL</button>
-              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('DIV')">[ / ] DIV</button>
-              <button class="btn-palette" onclick="SimulatorModule.addInstructionToRung('MOVE')">[ MOV ] MOVE</button>
+              <button class="btn-palette" data-node-type="ADD" onclick="SimulatorModule.addInstructionToRung('ADD')">[ + ] ADD</button>
+              <button class="btn-palette" data-node-type="SUB" onclick="SimulatorModule.addInstructionToRung('SUB')">[ - ] SUB</button>
+              <button class="btn-palette" data-node-type="MUL" onclick="SimulatorModule.addInstructionToRung('MUL')">[ * ] MUL</button>
+              <button class="btn-palette" data-node-type="DIV" onclick="SimulatorModule.addInstructionToRung('DIV')">[ / ] DIV</button>
+              <button class="btn-palette" data-node-type="MOVE" onclick="SimulatorModule.addInstructionToRung('MOVE')">[ MOV ] MOVE</button>
             </div>
           </div>
         </aside>

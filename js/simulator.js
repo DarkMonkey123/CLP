@@ -58,6 +58,9 @@
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
   const blankBits = (n) => Array.from({ length: n }, () => false);
+  const isMobileLandscape = () => window.matchMedia(
+    '(orientation: landscape) and (max-width: 1100px) and (max-height: 700px)'
+  ).matches;
 
   function bindOnce(el, key, fn) {
     if (!el) return;
@@ -1238,6 +1241,9 @@
       renderLinterSummary(warn);
 
       holder.innerHTML = ladderProgram.rungs.map((r, i) => this.rungHTML(r, i, warn)).join('');
+      if (isMobileLandscape()) {
+        holder.querySelectorAll('[draggable="true"]').forEach((el) => el.setAttribute('draggable', 'false'));
+      }
       this.rebuildCache(holder);
 
       SimulatorModule.applySelectionClasses();
@@ -1285,12 +1291,16 @@
       const w = warn.node[node.id];
       const tagName = getTagName(node.target);
       const isNamed = tagName !== node.target;
+      const inputAddress = ['NO', 'NC', 'P_EDGE'].includes(node.type)
+        && parseAddress(node.target)?.area === 'I'
+        ? node.target
+        : null;
       const displayTag = ['EQU', 'NEQ', 'GRT', 'LES', 'GEQ', 'LEQ', 'ADD', 'SUB', 'MUL', 'DIV', 'MOVE'].includes(node.type)
         ? `${node.inA || 'InA'} / ${node.inB || 'InB'} → ${node.target}`
         : node.target;
 
       return `
-        <div class="ladder-block${w ? ' has-warning' : ''}" data-node-id="${node.id}" data-type="${node.type}" draggable="true">
+        <div class="ladder-block${w ? ' has-warning' : ''}" data-node-id="${node.id}" data-type="${node.type}"${inputAddress ? ` data-input-address="${esc(inputAddress)}" aria-label="Alternar entrada ${esc(inputAddress)}"` : ''} draggable="${isMobileLandscape() ? 'false' : 'true'}">
           <button type="button" class="btn-delete-element" data-action="delete-node" data-node-id="${node.id}" title="Remover">×</button>
           <i class="bit-dot"></i>
           <span class="ladder-block-tag" style="font-size: 0.68rem; color: var(--accent-color);">${isNamed && !displayTag.includes('→') ? esc(tagName) : ''}</span>
@@ -1383,6 +1393,9 @@
         } else {
           ref.el.classList.toggle('energized', outF);
           if (ref.dot) ref.dot.classList.toggle('on', !!(res && res.bit));
+          if (ref.el.hasAttribute('data-input-address')) {
+            ref.el.setAttribute('aria-pressed', String(!!(res && res.bit)));
+          }
           if (ref.sub && ref.node) {
             const txt = subTextFor(ref.node);
             if (ref.sub.textContent !== txt) ref.sub.textContent = txt;
@@ -2076,9 +2089,9 @@
       return 'I0.0';
     },
 
-    createNodeObject(type) {
+    createNodeObject(type, target) {
       if (type === 'PARALLEL' || type === 'BRANCH') return PAR([], []);
-      const node = { id: uid(), type, target: this.suggestTag(type) };
+      const node = { id: uid(), type, target: target || this.suggestTag(type) };
       if (['TON', 'TOF', 'TP'].includes(type)) node.pt = 3;
       if (['CTU', 'CTD'].includes(type)) node.pv = 3;
       if (['EQU', 'NEQ', 'GRT', 'LES', 'GEQ', 'LEQ', 'ADD', 'SUB', 'MUL', 'DIV', 'MOVE'].includes(type)) {
@@ -2090,7 +2103,7 @@
 
     placeNode(seqInfo, index, payload) {
       if (payload.kind === 'new') {
-        const node = this.createNodeObject(payload.type);
+        const node = this.createNodeObject(payload.type, payload.target);
         History.checkpoint();
         seqInfo.array.splice(index, 0, node);
         selectedNodeId = node.id;
@@ -2111,11 +2124,11 @@
       return true;
     },
 
-    addInstructionToRung(type) {
-      this.addFromPalette(type);
+    addInstructionToRung(type, target) {
+      this.addFromPalette(type, target);
     },
 
-    addFromPalette(type) {
+    addFromPalette(type, target) {
       let seqInfo;
       let index;
       const sel = selectedNodeId && locateNode(selectedNodeId);
@@ -2129,11 +2142,11 @@
         seqInfo = { array: rung.nodes, depth: 0 };
         index = rung.nodes.length;
       }
-      this.placeNode(seqInfo, index, { kind: 'new', type });
+      this.placeNode(seqInfo, index, { kind: 'new', type, target });
     },
 
-    handleDragStart(event, type) {
-      dragPayload = { kind: 'new', type };
+    handleDragStart(event, type, target) {
+      dragPayload = { kind: 'new', type, target };
       if (event && event.dataTransfer) event.dataTransfer.setData('text/plain', type);
     },
 
@@ -2313,8 +2326,18 @@
         this._globalBound = true;
         window.addEventListener('pointerup', () => this.releaseAllInputs());
         window.addEventListener('pointercancel', () => this.releaseAllInputs());
+        window.addEventListener('resize', () => this.updateDragAvailability());
         document.addEventListener('keydown', (e) => this.onKeyDown(e));
       }
+      this.updateDragAvailability();
+    },
+
+    updateDragAvailability() {
+      const draggable = String(!isMobileLandscape());
+      document.querySelectorAll('.palette-item, .btn-palette, .ladder-block, .parallel-group-container')
+        .forEach((el) => {
+          if (el.getAttribute('draggable') !== draggable) el.setAttribute('draggable', draggable);
+        });
     },
 
     bindHardware() {
@@ -2336,9 +2359,9 @@
     bindPalette() {
       document.querySelectorAll('.palette-item, .btn-palette').forEach((item) => {
         const direct = item.dataset.type || item.dataset.nodeType;
+        const target = item.dataset.nodeTarget;
         bindOnce(item, 'palette', () => {
-          item.setAttribute('draggable', 'true');
-          item.addEventListener('dragstart', (e) => this.handleDragStart(e, direct));
+          item.addEventListener('dragstart', (e) => this.handleDragStart(e, direct, target));
           item.addEventListener('dragend', () => this.endDrag());
         });
       });
@@ -2389,6 +2412,14 @@
       }
       const nodeEl = e.target.closest('.ladder-block, .parallel-group-container');
       selectedNodeId = nodeEl ? nodeEl.dataset.nodeId : null;
+      const inputContact = e.target.closest('.ladder-block[data-input-address]');
+      if (inputContact && isMobileLandscape()) {
+        const address = parseAddress(inputContact.dataset.inputAddress);
+        if (address) {
+          this.toggleInput(address.index);
+          this.tick();
+        }
+      }
       this.applySelectionClasses();
     },
 
@@ -2396,7 +2427,10 @@
       const comment = e.target.closest('.rung-comment');
       if (comment) { this.editComment(comment.dataset.commentFor, comment); return; }
       const block = e.target.closest('.ladder-block');
-      if (block && !e.target.closest('button')) this.openConfigModal(block.dataset.nodeId);
+      if (block && !e.target.closest('button')
+        && !(isMobileLandscape() && block.hasAttribute('data-input-address'))) {
+        this.openConfigModal(block.dataset.nodeId);
+      }
     },
 
     onKeyDown(e) {
