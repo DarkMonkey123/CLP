@@ -14,6 +14,7 @@ const CatalogModule = (function () {
   'use strict';
 
   let activeCategory = null;
+  let isInitialized = false;
   let compareList = []; // Máximo 3 itens
   let bomItems = {};    // { "clp": 2, "sensor-indutivo": 1 }
   let currentViewMode = 'symbol';
@@ -167,6 +168,8 @@ const CatalogModule = (function () {
   }
 
   function init() {
+    if (isInitialized) return;
+    isInitialized = true;
     renderCategorySelects();
     renderCategoryBlocks();
     renderBOMTable();
@@ -721,5 +724,4 @@ const CatalogModule = (function () {
   };
 })();
 
-document.addEventListener('DOMContentLoaded', () => CatalogModule.init());
 window.CatalogModule = CatalogModule;
