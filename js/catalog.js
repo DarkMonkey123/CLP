@@ -232,6 +232,16 @@ const CatalogModule = (function () {
 
   function backToCategoryBlocks() {
     activeCategory = null;
+    const textInput = document.getElementById('filter-search-text');
+    const catSelect = document.getElementById('filter-category');
+    const manufacturerSelect = document.getElementById('filter-manufacturer');
+    const ipSelect = document.getElementById('filter-ip');
+    const outputSelect = document.getElementById('filter-output');
+    if (textInput) textInput.value = '';
+    if (catSelect) catSelect.value = 'ALL';
+    if (manufacturerSelect) manufacturerSelect.value = 'ALL';
+    if (ipSelect) ipSelect.value = 'ALL';
+    if (outputSelect) outputSelect.value = 'ALL';
     document.getElementById('subview-equipment-list').style.display = 'none';
     document.getElementById('subview-category-blocks').style.display = 'block';
     renderCategoryBlocks();
@@ -239,11 +249,15 @@ const CatalogModule = (function () {
 
   function applyMultiFilters() {
     const textInput = document.getElementById('filter-search-text');
-    const text = textInput ? textInput.value.toLowerCase() : '';
-    const cat = document.getElementById('filter-category').value;
-    const mfg = document.getElementById('filter-manufacturer').value;
-    const ip = document.getElementById('filter-ip').value;
-    const out = document.getElementById('filter-output').value;
+    const text = textInput ? textInput.value.trim().toLowerCase() : '';
+    const catSelect = document.getElementById('filter-category');
+    const mfgSelect = document.getElementById('filter-manufacturer');
+    const ipSelect = document.getElementById('filter-ip');
+    const outputSelect = document.getElementById('filter-output');
+    const cat = catSelect?.value || 'ALL';
+    const mfg = mfgSelect?.value || 'ALL';
+    const ip = ipSelect?.value || 'ALL';
+    const out = outputSelect?.value || 'ALL';
 
     const favorites = getFavorites();
     const allItems = getAllEquipments();
@@ -262,6 +276,29 @@ const CatalogModule = (function () {
     });
 
     renderEquipments(filtered);
+
+    const hasActiveFilters = Boolean(text) || cat !== 'ALL' || mfg !== 'ALL' || ip !== 'ALL' || out !== 'ALL';
+    const categoryBlocks = document.getElementById('subview-category-blocks');
+    const equipmentList = document.getElementById('subview-equipment-list');
+    const titleEl = document.getElementById('current-category-title');
+
+    if (cat === 'ALL') activeCategory = null;
+    if (categoryBlocks) categoryBlocks.style.display = hasActiveFilters ? 'none' : 'block';
+    if (equipmentList) equipmentList.style.display = hasActiveFilters ? 'block' : 'none';
+
+    if (titleEl && hasActiveFilters) {
+      const categories = (typeof CATALOG_DATA !== 'undefined' && CATALOG_DATA.categories)
+        ? CATALOG_DATA.categories
+        : CATEGORIES_DEFAULT;
+      const selectedCategory = categories.find(category => category.id === cat);
+      if (selectedCategory) {
+        titleEl.textContent = selectedCategory.name || selectedCategory.title;
+      } else if (text) {
+        titleEl.textContent = `Resultados da busca (${filtered.length})`;
+      } else {
+        titleEl.textContent = `Equipamentos filtrados (${filtered.length})`;
+      }
+    }
   }
 
   function renderEquipments(items) {

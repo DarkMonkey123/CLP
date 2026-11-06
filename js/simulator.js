@@ -1205,7 +1205,7 @@
         }).join('');
       }
 
-      this.updateOutputMonitor();
+      SimulatorModule.updateOutputMonitor();
     },
 
     ensureShell(ws) {
@@ -1364,7 +1364,7 @@
         const led = document.getElementById(`led-output-${idx}`);
         if (led) led.classList.toggle('on', val);
       });
-      this.updateOutputMonitor();
+      SimulatorModule.updateOutputMonitor();
 
       const c = this.cache;
       if (!c) return;
